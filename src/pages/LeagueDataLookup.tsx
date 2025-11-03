@@ -343,7 +343,7 @@ export const LeagueDataLookup: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            riot: riotId,
+            riotId: riotId,
             region: region
           })
         });
