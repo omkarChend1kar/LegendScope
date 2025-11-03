@@ -12,7 +12,7 @@ import {
   CheckCircle,
   Globe
 } from 'lucide-react';
-import { body } from 'framer-motion/client';
+
 
 const LookupContainer = styled.div`
   padding: ${theme.spacing.lg};
