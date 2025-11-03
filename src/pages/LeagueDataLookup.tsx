@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '../styles/theme';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { 
+import {
   Search,
   User,
   Trophy,
@@ -12,6 +12,7 @@ import {
   CheckCircle,
   Globe
 } from 'lucide-react';
+import { body } from 'framer-motion/client';
 
 const LookupContainer = styled.div`
   padding: ${theme.spacing.lg};
@@ -307,7 +308,7 @@ export const LeagueDataLookup: React.FC = () => {
       if (false) {
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
         // Mock successful response
         const mockData: SummonerData = {
           summoner: {
@@ -349,7 +350,10 @@ export const LeagueDataLookup: React.FC = () => {
         });
 
         const data = await response.json();
-
+        console.log('API Payload:', JSON.stringify({
+          riotId: riotId,
+          region: region
+        }));
         console.log('API Response:', data);
 
         if (response.ok) {
@@ -383,7 +387,7 @@ export const LeagueDataLookup: React.FC = () => {
       145: "Kai'Sa",
       // Add more champions as needed
     };
-    
+
     return championMap[championId] || `Champion ${championId}`;
   };
 
