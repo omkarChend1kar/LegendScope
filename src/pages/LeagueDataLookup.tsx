@@ -277,7 +277,7 @@ export const LeagueDataLookup: React.FC = () => {
   const [summonerData, setSummonerData] = useState<SummonerData | null>(null);
 
   // Mock API URL - in production this would be your Lambda function URL
-  const RIOT_API_URL = import.meta.env.VITE_RIOT_API_URL || 'https://khqf3gvliey6fdtnsysunoi6su0qhmyx.lambda-url.eu-north-1.on.aws/';
+  const RIOT_API_URL = import.meta.env.VITE_RIOT_API_URL || 'https://khqf3gvliey6fdtnsysunoi6su0qhmyx.lambda-url.eu-north-1.on.aws';
 
   const showMessage = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage({ text, type });
@@ -349,6 +349,8 @@ export const LeagueDataLookup: React.FC = () => {
         });
 
         const data = await response.json();
+
+        console.log('API Response:', data);
 
         if (response.ok) {
           setSummonerData(data);
