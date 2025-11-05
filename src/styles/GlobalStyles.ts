@@ -2,7 +2,7 @@ import { createGlobalStyle } from 'styled-components';
 import { theme } from './theme';
 
 export const GlobalStyles = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
   
   * {
     margin: 0;
@@ -16,12 +16,17 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: ${theme.typography.fontFamily.secondary};
+    font-family: ${theme.typography.fontFamily.sans};
     background: ${theme.colors.gradients.primary};
     color: ${theme.colors.neutral.lightGray};
     line-height: ${theme.typography.lineHeight.normal};
     min-height: 100vh;
     overflow-x: hidden;
+    
+    /* Cinematic text rendering */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   #root {
@@ -58,7 +63,7 @@ export const GlobalStyles = createGlobalStyle`
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    font-family: ${theme.typography.fontFamily.primary};
+    font-family: ${theme.typography.fontFamily.serif};
     color: ${theme.colors.primary.lightGold};
     font-weight: ${theme.typography.fontWeight.semibold};
     line-height: ${theme.typography.lineHeight.tight};
@@ -91,7 +96,7 @@ export const GlobalStyles = createGlobalStyle`
   a {
     color: ${theme.colors.primary.gold};
     text-decoration: none;
-    transition: color ${theme.animations.transition.fast};
+    transition: color ${theme.animations.transition.whisper};
     
     &:hover {
       color: ${theme.colors.primary.lightGold};
@@ -172,12 +177,34 @@ export const GlobalStyles = createGlobalStyle`
     }
   }
 
-  @keyframes purpleGlow {
+  @keyframes etherealGlow {
     0%, 100% {
-      box-shadow: 0 0 20px ${theme.colors.accent.purple}40;
+      box-shadow: 0 0 20px ${theme.colors.accent.ethereal}40;
     }
     50% {
-      box-shadow: 0 0 30px ${theme.colors.accent.purple}80;
+      box-shadow: 0 0 30px ${theme.colors.accent.ethereal}80;
+    }
+  }
+  
+  @keyframes mistFloat {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-10px) translateX(5px);
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes whisper {
+    0%, 100% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.02);
     }
   }
 
@@ -198,8 +225,53 @@ export const GlobalStyles = createGlobalStyle`
     animation: glow 2s ease-in-out infinite;
   }
 
-  .animate-purpleGlow {
-    animation: purpleGlow 2s ease-in-out infinite;
+  .animate-etherealGlow {
+    animation: etherealGlow 3s ease-in-out infinite;
+  }
+  
+  .animate-mistFloat {
+    animation: mistFloat 8s ease-in-out infinite;
+  }
+  
+  .animate-whisper {
+    animation: whisper 4s ease-in-out infinite;
+  }
+  
+  /* Cinematic narrative classes */
+  .narrative-text {
+    font-family: ${theme.typography.fontFamily.narrative};
+    font-style: italic;
+    color: ${theme.colors.accent.mist};
+    line-height: ${theme.typography.lineHeight.relaxed};
+  }
+  
+  .ethereal-glow {
+    box-shadow: ${theme.shadows.mistGlow};
+    transition: box-shadow ${theme.animations.transition.reveal};
+    
+    &:hover {
+      box-shadow: ${theme.shadows.blueGlow};
+    }
+  }
+  
+  .memory-fade {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all ${theme.animations.gestalt.continuity};
+    
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .closure-reveal {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+    transition: clip-path ${theme.animations.gestalt.closure};
+    
+    &.revealed {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
   }
 
   /* Responsive utilities */

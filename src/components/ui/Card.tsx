@@ -27,7 +27,7 @@ const getCardVariant = (variant: CardProps['variant']) => {
     case 'purple':
       return css`
         background: ${theme.colors.gradients.secondary};
-        border: 2px solid ${theme.colors.accent.lightPurple};
+        border: 2px solid ${theme.colors.accent.ethereal};
         color: ${theme.colors.neutral.white};
       `;
       
@@ -88,7 +88,7 @@ const StyledCard = styled.div<CardProps>`
   ${({ glow, variant }) =>
     glow &&
     css`
-      box-shadow: ${variant === 'purple' ? theme.shadows.purpleGlow : theme.shadows.glow};
+      box-shadow: ${variant === 'purple' ? theme.shadows.blueGlow : theme.shadows.glow};
       
       &:hover {
         box-shadow: ${variant === 'purple' ? 
@@ -110,7 +110,7 @@ const StyledCard = styled.div<CardProps>`
     background: linear-gradient(
       45deg,
       ${theme.colors.primary.gold},
-      ${theme.colors.accent.purple},
+      ${theme.colors.accent.ethereal},
       ${theme.colors.primary.gold}
     );
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);

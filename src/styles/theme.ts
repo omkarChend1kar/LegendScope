@@ -1,51 +1,55 @@
 export const theme = {
   colors: {
-    // Primary League of Legends colors
+    // Cinematic Deep Indigo & Ethereal Gold Palette
     primary: {
-      gold: '#C8AA6E',
-      lightGold: '#F0E6D2',
-      darkGold: '#8B7355',
+      gold: '#C8AA6E',           // Pale gold
+      lightGold: '#F0E6D2',      // Ethereal gold
+      darkGold: '#8B7355',       // Muted gold
+      arcaneGold: '#E8D5A3',     // Mystical gold for highlights
     },
     
-    // Blue tones inspired by League's mystical elements
+    // Deep Indigo & Smoky Gray Foundation
     secondary: {
-      blue: '#0596AA',
-      lightBlue: '#5BC0DE',
-      darkBlue: '#0F2027',
-      navy: '#1E232A',
+      deepIndigo: '#1a1b3a',     // Deep indigo background
+      smokyGray: '#2d2e3f',      // Smoky gray layers  
+      darkBlue: '#0F1419',       // Deepest blue-black
+      navy: '#1C1E2B',           // Mist navy
+      indigoMist: '#252647',     // Indigo with mist
     },
     
-    // Purple/Mystical tones
+    // Ethereal & Mystical Accents
     accent: {
-      purple: '#9D4EDD',
-      lightPurple: '#C77DFF',
-      darkPurple: '#5A189A',
-      magenta: '#C724B1',
+      arcaneBlue: '#4A90E2',     // Arcane blue highlights
+      ethereal: '#6B73FF',       // Ethereal blue-purple
+      mist: '#8892B0',           // Mist color for subtle elements
+      whisper: '#A0A8CC',        // Whisper gray-blue
     },
     
-    // Neutral tones
+    // Narrative Neutral Tones
     neutral: {
-      white: '#FFFFFF',
-      lightGray: '#A09B8C',
-      gray: '#5A5A5A',
-      darkGray: '#3C3C41',
-      black: '#0F0F0F',
+      white: '#F8FAFC',          // Soft white
+      lightGray: '#CBD2E0',      // Light narrative gray
+      gray: '#64748B',           // Story gray
+      darkGray: '#334155',       // Deep story gray
+      black: '#0F172A',          // Narrative black
     },
     
-    // Status colors
+    // Emotional Status Colors
     status: {
-      success: '#00B74A',
-      warning: '#F57C00',
-      error: '#F44336',
-      info: '#2196F3',
+      triumph: '#10B981',        // Victory green
+      challenge: '#F59E0B',      // Growth opportunity amber
+      struggle: '#EF4444',       // Area to illuminate red
+      wisdom: '#3B82F6',         // Insight blue
     },
     
-    // Background gradients
+    // Cinematic Background Gradients
     gradients: {
-      primary: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)',
-      secondary: 'linear-gradient(135deg, #5A189A 0%, #9D4EDD 50%, #C77DFF 100%)',
-      gold: 'linear-gradient(135deg, #8B7355 0%, #C8AA6E 50%, #F0E6D2 100%)',
-      card: 'linear-gradient(145deg, #1E232A 0%, #2C323A 100%)',
+      primary: 'linear-gradient(135deg, #0F172A 0%, #1a1b3a 35%, #252647 70%, #1C1E2B 100%)',
+      secondary: 'linear-gradient(135deg, #1a1b3a 0%, #252647 50%, #2d2e3f 100%)',
+      gold: 'linear-gradient(135deg, #8B7355 0%, #C8AA6E 50%, #E8D5A3 100%)',
+      card: 'linear-gradient(145deg, rgba(29, 30, 58, 0.4) 0%, rgba(37, 38, 71, 0.6) 100%)',
+      mist: 'linear-gradient(180deg, rgba(200, 170, 110, 0.05) 0%, transparent 100%)',
+      ethereal: 'linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(107, 115, 255, 0.05) 100%)',
     },
     
     // Champion role colors
@@ -60,9 +64,11 @@ export const theme = {
   
   typography: {
     fontFamily: {
-      primary: "'Cinzel', serif", // Elegant serif for headings
-      secondary: "'Inter', sans-serif", // Clean sans-serif for body text
-      mono: "'JetBrains Mono', monospace", // For code and stats
+      serif: "'Cinzel', 'Georgia', serif", // Cinematic serif for narrative headers
+      narrative: "'Playfair Display', serif", // Alternative narrative serif
+      sans: "'Inter', 'Helvetica Neue', sans-serif", // Clean sans for body text
+      condensed: "'Inter Tight', sans-serif", // Narrow sans for stats
+      mono: "'JetBrains Mono', 'Courier New', monospace", // For code and precise data
     },
     
     fontSize: {
@@ -115,13 +121,22 @@ export const theme = {
   },
   
   shadows: {
-    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-    glow: '0 0 20px rgba(200, 170, 110, 0.4)', // Gold glow effect
-    goldGlow: '0 0 20px rgba(200, 170, 110, 0.4)', // Gold glow effect
-    purpleGlow: '0 0 20px rgba(157, 78, 221, 0.4)', // Purple glow effect
+    // Subtle depth shadows
+    sm: '0 2px 4px rgba(15, 23, 42, 0.08)',
+    md: '0 4px 12px rgba(15, 23, 42, 0.12)',
+    lg: '0 8px 24px rgba(15, 23, 42, 0.16)',
+    xl: '0 12px 32px rgba(15, 23, 42, 0.20)',
+    
+    // Cinematic glows
+    glow: '0 0 24px rgba(200, 170, 110, 0.3)', // Ethereal gold glow
+    goldGlow: '0 0 32px rgba(232, 213, 163, 0.4)', // Arcane gold glow
+    blueGlow: '0 0 28px rgba(74, 144, 226, 0.3)', // Mystical blue glow
+    mistGlow: '0 0 40px rgba(136, 146, 176, 0.2)', // Soft mist glow
+    
+    // Narrative depth
+    whisper: '0 0 16px rgba(160, 168, 204, 0.15)', // Subtle whisper shadow
+    echo: '0 4px 20px rgba(26, 27, 58, 0.4)', // Echo depth shadow
+    memory: 'inset 0 1px 0 rgba(248, 250, 252, 0.05)', // Memory highlight
   },
   
   breakpoints: {
@@ -134,9 +149,26 @@ export const theme = {
   
   animations: {
     transition: {
-      fast: '150ms ease-in-out',
-      normal: '300ms ease-in-out',
-      slow: '500ms ease-in-out',
+      whisper: '100ms ease-out', // Micro-interactions
+      normal: '300ms ease-in-out', // Standard transitions  
+      reveal: '600ms ease-out', // Section reveals
+      drift: '800ms ease-in-out', // Floating elements
+      ethereal: '1200ms ease-in-out', // Mystical animations
+    },
+    
+    // Cinematic timing curves
+    curves: {
+      entrance: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // Entrance bounce
+      exit: 'cubic-bezier(0.32, 0, 0.67, 0)', // Quick exit
+      float: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Floating motion
+      memory: 'cubic-bezier(0.23, 1, 0.32, 1)', // Memory fade
+    },
+    
+    // Gesture principles
+    gestalt: {
+      closure: '400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Incomplete reveal
+      continuity: '600ms cubic-bezier(0.23, 1, 0.32, 1)', // Flow between elements
+      proximity: '200ms ease-out', // Related elements grouping
     },
   },
 } as const;

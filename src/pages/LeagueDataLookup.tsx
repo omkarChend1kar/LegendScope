@@ -1,242 +1,274 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import {
   Search,
-  User,
-  Trophy,
-  Star,
   AlertCircle,
   CheckCircle,
-  Globe
+  Globe,
+  Swords
 } from 'lucide-react';
 
+// Page Container
+const PageContainer = styled.div`
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  background: #020617;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-const LookupContainer = styled.div`
-  padding: ${theme.spacing.lg};
-  max-width: 1200px;
+const ContentWrapper = styled.div`
+  max-width: 1000px;
+  width: 100%;
   margin: 0 auto;
 `;
 
-const LookupHeader = styled.div`
+// Header Section
+const Header = styled.header`
   text-align: center;
-  margin-bottom: ${theme.spacing.xl};
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.6s ease-out;
   
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+`;
+
+const LogoIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+`;
+
+const LogoText = styled.div`
   h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    background: ${theme.colors.gradients.gold};
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: ${theme.spacing.sm};
+    font-size: 1.875rem;
+    font-weight: ${theme.typography.fontWeight.bold};
+    color: #fbbf24;
+    margin: 0;
+    letter-spacing: -0.02em;
   }
   
   p {
-    font-size: ${theme.typography.fontSize.lg};
-    color: ${theme.colors.neutral.lightGray};
-    margin-bottom: ${theme.spacing.xl};
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0.25rem 0 0 0;
+    font-style: italic;
   }
 `;
 
-const LookupForm = styled(Card)`
-  max-width: 600px;
-  margin: 0 auto ${theme.spacing.xl};
+const Title = styled.h1`
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: ${theme.typography.fontWeight.bold};
+  color: #fbbf24;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.02em;
+`;
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #94a3b8;
+  margin: 0;
+`;
+
+// Form Section
+const FormContainer = styled.div`
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: ${theme.spacing.md};
+  margin-bottom: 1.5rem;
+  
+  &:last-of-type {
+    margin-bottom: 0;
+  }
   
   label {
     display: block;
     font-weight: ${theme.typography.fontWeight.semibold};
-    color: ${theme.colors.primary.lightGold};
-    margin-bottom: ${theme.spacing.xs};
-    font-size: ${theme.typography.fontSize.base};
+    color: #fbbf24;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   
   .form-hint {
-    font-size: ${theme.typography.fontSize.sm};
-    color: ${theme.colors.neutral.gray};
-    margin-top: ${theme.spacing.xs};
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.375rem;
     display: block;
   }
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
-  border: 2px solid rgba(200, 170, 110, 0.3);
-  border-radius: ${theme.borderRadius.lg};
-  background: rgba(0, 0, 0, 0.3);
-  color: ${theme.colors.neutral.white};
-  font-size: ${theme.typography.fontSize.base};
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 0.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  color: #f8fafc;
+  font-size: 0.875rem;
   transition: all ${theme.animations.transition.normal};
   
   &:focus {
     outline: none;
-    border-color: ${theme.colors.primary.gold};
-    box-shadow: ${theme.shadows.glow};
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(15, 23, 42, 0.8);
   }
   
   &::placeholder {
-    color: ${theme.colors.neutral.gray};
+    color: #64748b;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
-  border: 2px solid rgba(200, 170, 110, 0.3);
-  border-radius: ${theme.borderRadius.lg};
-  background: rgba(0, 0, 0, 0.3);
-  color: ${theme.colors.neutral.white};
-  font-size: ${theme.typography.fontSize.base};
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 0.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  color: #f8fafc;
+  font-size: 0.875rem;
   transition: all ${theme.animations.transition.normal};
   cursor: pointer;
   
   &:focus {
     outline: none;
-    border-color: ${theme.colors.primary.gold};
-    box-shadow: ${theme.shadows.glow};
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(15, 23, 42, 0.8);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   
   option {
-    background: ${theme.colors.secondary.darkBlue};
-    color: ${theme.colors.neutral.white};
+    background: #0f172a;
+    color: #f8fafc;
   }
 `;
 
 const MessageContainer = styled.div<{ type: 'success' | 'error' | 'info' }>`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing.sm};
-  padding: ${theme.spacing.md};
-  border-radius: ${theme.borderRadius.lg};
-  margin-bottom: ${theme.spacing.md};
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
   font-weight: ${theme.typography.fontWeight.medium};
+  animation: slideDown 0.3s ease-out;
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
   
   ${({ type }) => {
     switch (type) {
       case 'success':
         return `
-          background: rgba(0, 183, 74, 0.1);
-          border: 1px solid ${theme.colors.status.success};
-          color: ${theme.colors.status.success};
+          background: rgba(34, 197, 94, 0.1);
+          border: 1px solid rgba(34, 197, 94, 0.3);
+          color: #4ade80;
         `;
       case 'error':
         return `
-          background: rgba(244, 67, 54, 0.1);
-          border: 1px solid ${theme.colors.status.error};
-          color: ${theme.colors.status.error};
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          color: #f87171;
         `;
       case 'info':
         return `
-          background: rgba(33, 150, 243, 0.1);
-          border: 1px solid ${theme.colors.status.info};
-          color: ${theme.colors.status.info};
+          background: rgba(59, 130, 246, 0.1);
+          border: 1px solid rgba(59, 130, 246, 0.3);
+          color: #60a5fa;
         `;
     }
   }}
 `;
 
-const ResultsContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const SummonerCard = styled(Card)`
-  text-align: center;
-  margin-bottom: ${theme.spacing.lg};
-  
-  .summoner-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: ${theme.borderRadius.full};
-    background: ${theme.colors.gradients.secondary};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto ${theme.spacing.md};
-    font-size: ${theme.typography.fontSize['2xl']};
-    font-weight: ${theme.typography.fontWeight.bold};
-    color: ${theme.colors.neutral.white};
-  }
-  
-  .summoner-name {
-    font-size: ${theme.typography.fontSize['2xl']};
-    font-weight: ${theme.typography.fontWeight.bold};
-    color: ${theme.colors.primary.lightGold};
-    margin-bottom: ${theme.spacing.xs};
-  }
-  
-  .summoner-level {
-    font-size: ${theme.typography.fontSize.lg};
-    color: ${theme.colors.neutral.lightGray};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: ${theme.spacing.xs};
-  }
-`;
-
-const ChampionsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: ${theme.spacing.md};
-`;
-
-const ChampionCard = styled.div`
-  background: ${theme.colors.gradients.card};
-  border: 2px solid ${theme.colors.neutral.darkGray};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing.md};
-  transition: all ${theme.animations.transition.normal};
-  border-left: 4px solid ${theme.colors.primary.gold};
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.md};
-  }
-  
-  .champion-header {
-    display: flex;
-    align-items: center;
-    justify-content: between;
-    margin-bottom: ${theme.spacing.sm};
-  }
-  
-  .champion-id {
-    font-size: ${theme.typography.fontSize.lg};
-    font-weight: ${theme.typography.fontWeight.bold};
-    color: ${theme.colors.primary.lightGold};
-  }
-  
-  .champion-level {
-    background: ${theme.colors.primary.gold};
-    color: ${theme.colors.secondary.darkBlue};
-    padding: 4px 8px;
-    border-radius: ${theme.borderRadius.sm};
-    font-size: ${theme.typography.fontSize.sm};
-    font-weight: ${theme.typography.fontWeight.medium};
-    margin-left: auto;
-  }
-  
-  .champion-points {
-    font-size: ${theme.typography.fontSize.base};
-    color: ${theme.colors.neutral.lightGray};
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing.xs};
-  }
-`;
-
-const ButtonContainer = styled.div`
+const SearchButton = styled.button`
+  width: 100%;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: ${theme.spacing.md};
-  margin-top: ${theme.spacing.md};
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: #fbbf24;
+  color: #020617;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: ${theme.typography.fontWeight.semibold};
+  cursor: pointer;
+  transition: all ${theme.animations.transition.normal};
+  margin-top: 1.5rem;
+  
+  &:hover:not(:disabled) {
+    background: #f59e0b;
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 interface SummonerData {
@@ -249,6 +281,19 @@ interface SummonerData {
     championLevel: number;
     championPoints: number;
   }>;
+}
+
+interface PlayerData {
+  riotId: string;
+  region: string;
+  summoner: {
+    name: string;
+    level: number;
+  };
+}
+
+interface LeagueDataLookupProps {
+  onPlayerFound: (data: PlayerData) => void;
 }
 
 interface Message {
@@ -270,12 +315,11 @@ const regions = [
   { value: 'jp1', label: 'Japan' },
 ];
 
-export const LeagueDataLookup: React.FC = () => {
+export const LeagueDataLookup: React.FC<LeagueDataLookupProps> = ({ onPlayerFound }) => {
   const [riotId, setRiotId] = useState('');
   const [region, setRegion] = useState('na1');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
-  const [summonerData, setSummonerData] = useState<SummonerData | null>(null);
 
   // Mock API URL - in production this would be your Lambda function URL
   const RIOT_API_URL = import.meta.env.VITE_RIOT_API_URL || 'https://khqf3gvliey6fdtnsysunoi6su0qhmyx.lambda-url.eu-north-1.on.aws';
@@ -301,11 +345,12 @@ export const LeagueDataLookup: React.FC = () => {
 
     setLoading(true);
     setMessage(null);
-    setSummonerData(null);
 
     try {
-      // For demo purposes, we'll simulate an API call with mock data
-      if (false) {
+      // Mock API response for testing - change to true to use mock data
+      const useMockData = true;
+      
+      if (useMockData) {
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -334,8 +379,16 @@ export const LeagueDataLookup: React.FC = () => {
           ]
         };
 
-        setSummonerData(mockData);
-        showMessage('Summoner found!', 'success');
+        showMessage('Summoner found! Redirecting to dashboard...', 'success');
+        
+        // Navigate to dashboard after short delay
+        setTimeout(() => {
+          onPlayerFound({
+            riotId: riotId,
+            region: region,
+            summoner: mockData.summoner
+          });
+        }, 1500);
       } else {
         // Real API call
         const response = await fetch(RIOT_API_URL, {
@@ -350,15 +403,18 @@ export const LeagueDataLookup: React.FC = () => {
         });
 
         const data = await response.json();
-        console.log('API Payload:', JSON.stringify({
-          riotId: riotId,
-          region: region
-        }));
-        console.log('API Response:', data);
 
         if (response.ok) {
-          setSummonerData(data);
-          showMessage('Summoner found!', 'success');
+          showMessage('Summoner found! Redirecting to dashboard...', 'success');
+          
+          // Navigate to dashboard after short delay
+          setTimeout(() => {
+            onPlayerFound({
+              riotId: riotId,
+              region: region,
+              summoner: data.summoner
+            });
+          }, 1500);
         } else {
           showMessage(data.error || 'Failed to fetch summoner data', 'error');
         }
@@ -377,29 +433,25 @@ export const LeagueDataLookup: React.FC = () => {
     }
   };
 
-  const getChampionName = (championId: number): string => {
-    // In a real app, you'd have a champion mapping
-    const championMap: { [key: number]: string } = {
-      51: 'Caitlyn',
-      222: 'Jinx',
-      67: 'Vayne',
-      81: 'Ezreal',
-      145: "Kai'Sa",
-      // Add more champions as needed
-    };
-
-    return championMap[championId] || `Champion ${championId}`;
-  };
-
   return (
-    <LookupContainer className="animate-fadeIn">
-      <LookupHeader>
-        <h1>League Data Lookup</h1>
-        <p>Enter a Riot ID to see their level and top champions!</p>
-      </LookupHeader>
+    <PageContainer>
+      <ContentWrapper>
+        <Header>
+          <LogoContainer>
+            <LogoIcon>
+              <Swords size={28} color="#0f172a" />
+            </LogoIcon>
+            <LogoText>
+              <h1>LegendScope</h1>
+              <p>Every battle tells a story</p>
+            </LogoText>
+          </LogoContainer>
+          
+          <Title>Summoner's Gate</Title>
+          <Subtitle>Enter your Riot ID to begin your journey</Subtitle>
+        </Header>
 
-      <LookupForm variant="default" hover>
-        <Card.Content>
+        <FormContainer>
           {message && (
             <MessageContainer type={message.type}>
               {message.type === 'success' && <CheckCircle size={20} />}
@@ -439,82 +491,12 @@ export const LeagueDataLookup: React.FC = () => {
             </Select>
           </FormGroup>
 
-          <ButtonContainer>
-            <Button
-              variant="primary"
-              onClick={handleLookup}
-              disabled={loading}
-            >
-              <Search size={16} />
-              {loading ? 'Looking up...' : 'Look Up Summoner'}
-            </Button>
-          </ButtonContainer>
-        </Card.Content>
-      </LookupForm>
-
-      {summonerData && (
-        <ResultsContainer>
-          <SummonerCard variant="highlight" glow>
-            <Card.Header>
-              <h3>
-                <User size={20} style={{ display: 'inline', marginRight: '8px' }} />
-                Summoner Info
-              </h3>
-            </Card.Header>
-            <Card.Content>
-              <div className="summoner-avatar">
-                {summonerData.summoner.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="summoner-name">{summonerData.summoner.name}</div>
-              <div className="summoner-level">
-                <Star size={20} />
-                Level {summonerData.summoner.level}
-              </div>
-            </Card.Content>
-          </SummonerCard>
-
-          {summonerData.topChampions && summonerData.topChampions.length > 0 && (
-            <Card hover>
-              <Card.Header>
-                <h3>
-                  <Trophy size={20} style={{ display: 'inline', marginRight: '8px' }} />
-                  Top Champions
-                </h3>
-              </Card.Header>
-              <Card.Content>
-                <ChampionsGrid>
-                  {summonerData.topChampions.map((champion, index) => (
-                    <ChampionCard key={champion.championId}>
-                      <div className="champion-header">
-                        <div className="champion-id">
-                          #{index + 1} {getChampionName(champion.championId)}
-                        </div>
-                        <div className="champion-level">
-                          M{champion.championLevel}
-                        </div>
-                      </div>
-                      <div className="champion-points">
-                        <Trophy size={16} />
-                        {champion.championPoints.toLocaleString()} points
-                      </div>
-                    </ChampionCard>
-                  ))}
-                </ChampionsGrid>
-              </Card.Content>
-            </Card>
-          )}
-
-          {(!summonerData.topChampions || summonerData.topChampions.length === 0) && (
-            <Card>
-              <Card.Content>
-                <p style={{ textAlign: 'center', color: theme.colors.neutral.lightGray }}>
-                  No champion mastery data found.
-                </p>
-              </Card.Content>
-            </Card>
-          )}
-        </ResultsContainer>
-      )}
-    </LookupContainer>
+          <SearchButton onClick={handleLookup} disabled={loading}>
+            <Search size={16} />
+            {loading ? 'Looking up...' : 'Look Up Summoner'}
+          </SearchButton>
+        </FormContainer>
+      </ContentWrapper>
+    </PageContainer>
   );
 };
