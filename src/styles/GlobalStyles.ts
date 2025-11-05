@@ -12,7 +12,7 @@ export const GlobalStyles = createGlobalStyle`
 
   html {
     font-size: 16px;
-    scroll-behavior: smooth;
+    /* Removed scroll-behavior: smooth - causes stuttering */
   }
 
   body {
