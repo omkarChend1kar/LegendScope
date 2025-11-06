@@ -20,7 +20,7 @@ const PageContainer = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1000px;
+  max-width: 520px;
   width: 100%;
   margin: 0 auto;
 `;
@@ -80,7 +80,7 @@ const LogoText = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: ${theme.typography.fontWeight.bold};
   color: #fbbf24;
   margin: 0 0 0.75rem 0;

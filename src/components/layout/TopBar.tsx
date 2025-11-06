@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
-import { Search, Download, UserCircle } from 'lucide-react';
+import { Search, UserCircle } from 'lucide-react';
 
 const Header = styled.header`
   position: sticky;
@@ -70,50 +70,6 @@ const ActionsContainer = styled.div`
   gap: 0.75rem;
 `;
 
-const Select = styled.select`
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  color: #f1f5f9;
-  cursor: pointer;
-  transition: all ${theme.animations.transition.normal};
-  
-  &:focus {
-    outline: none;
-    border-color: #475569;
-  }
-  
-  &:hover {
-    background: rgba(30, 41, 59, 0.8);
-  }
-`;
-
-const ExportButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  background: #fbbf24;
-  color: #0f172a;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: ${theme.typography.fontWeight.medium};
-  cursor: pointer;
-  transition: all ${theme.animations.transition.normal};
-  
-  &:hover {
-    background: #f59e0b;
-  }
-  
-  svg {
-    width: 1rem;
-    height: 1rem;
-  }
-`;
-
 const ChangePlayerButton = styled.button`
   display: flex;
   align-items: center;
@@ -151,12 +107,6 @@ interface TopBarProps {
 
 export const TopBar = ({ onChangePlayer }: TopBarProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [timeRange, setTimeRange] = useState('30d');
-
-  const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log('Export clicked');
-  };
 
   return (
     <Header>
@@ -185,17 +135,6 @@ export const TopBar = ({ onChangePlayer }: TopBarProps) => {
                 <span>Switch Player</span>
               </ChangePlayerButton>
             )}
-
-            <Select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="season">This Season</option>
-            </Select>
-
-            <ExportButton onClick={handleExport}>
-              <Download />
-              <span>Export</span>
-            </ExportButton>
           </ActionsContainer>
         </HeaderInner>
       </HeaderContent>

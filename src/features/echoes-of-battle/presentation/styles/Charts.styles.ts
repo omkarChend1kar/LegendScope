@@ -10,74 +10,36 @@ export const TwoColumnGrid = styled.div`
 
 export const ChartCard = styled.div`
   position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(30, 41, 59, 0.95) 0%,
-    rgba(15, 23, 42, 0.98) 100%
-  );
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: ${designTokens.radius.xl};
-  padding: ${designTokens.spacing.xl};
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.3s ease;
-  overflow: hidden;
-  
-  /* Performance optimization */
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: ${designTokens.spacing.md};
+  padding: ${designTokens.spacing.md};
+  min-height: 220px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   contain: layout style paint;
   transform: translateZ(0);
-  
-  /* Subtle shine effect */
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(251, 191, 36, 0.03),
-      transparent
-    );
-    transition: left 0.6s ease;
-    pointer-events: none;
-  }
-  
+  overflow: visible;
+
   &:hover {
-    border-color: rgba(251, 191, 36, 0.2);
+    transform: translateZ(0) translateY(-2px);
     box-shadow: 
-      0 8px 20px -6px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(251, 191, 36, 0.08);
-    transform: translateY(-3px) translateZ(0);
-    will-change: transform, box-shadow;
-    
-    &::after {
-      left: 100%;
-    }
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 1px 3px rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.2);
   }
-  
-  /* Reduced motion support */
+
   @media (prefers-reduced-motion: reduce) {
-    transition-duration: 0.1s;
-    
-    &:hover {
-      transform: translateZ(0);
-    }
-    
-    &::after {
-      display: none;
-    }
+    animation: none;
+    transition: none;
   }
 `;
 
 export const ChartTitle = styled.h3`
-  font-size: ${designTokens.typography.fontSize.lg};
-  color: ${designTokens.colors.primary[400]};
-  margin: 0 0 ${designTokens.spacing.lg} 0;
-  font-weight: ${designTokens.typography.fontWeight.bold};
-  letter-spacing: ${designTokens.typography.letterSpacing.wide};
+  font-size: ${designTokens.typography.fontSize.sm};
+  color: ${designTokens.colors.text.secondary};
+  margin: 0 0 ${designTokens.spacing.md} 0;
+  font-weight: ${designTokens.typography.fontWeight.semibold};
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 `;
 
@@ -85,73 +47,56 @@ export const DonutChartContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 180px;
+  height: 120px;
   position: relative;
-  margin-bottom: ${designTokens.spacing.xl};
+  margin-bottom: ${designTokens.spacing.md};
 `;
 
 export const DonutChart = styled.svg`
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   transform: rotate(-90deg);
 `;
 
 export const ChartLegend = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${designTokens.spacing.md};
-  margin-top: ${designTokens.spacing.md};
+  gap: ${designTokens.spacing.xs};
 `;
 
 export const LegendItem = styled.div`
   display: flex;
   align-items: center;
-  gap: ${designTokens.spacing.md};
-  font-size: ${designTokens.typography.fontSize.sm};
-  padding: ${designTokens.spacing.sm} ${designTokens.spacing.md};
-  border-radius: ${designTokens.radius.md};
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: ${designTokens.spacing.sm};
+  font-size: ${designTokens.typography.fontSize.xs};
+  padding: ${designTokens.spacing.xs} 0;
+  transition: all 0.2s ease;
   
   &:hover {
-    background: rgba(251, 191, 36, 0.04);
-    transform: translateX(4px);
+    opacity: 0.8;
   }
 `;
 
 export const LegendColor = styled.div<{ $color: string }>`
-  width: 24px;
-  height: 24px;
+  width: 12px;
+  height: 12px;
   border-radius: ${designTokens.radius.sm};
   background: ${props => props.$color};
   flex-shrink: 0;
-  box-shadow: 
-    0 2px 8px ${props => props.$color}40,
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-  
-  ${LegendItem}:hover & {
-    transform: scale(1.1);
-    box-shadow: 
-      0 4px 12px ${props => props.$color}60,
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
 `;
 
 export const LegendLabel = styled.span`
   color: ${designTokens.colors.text.secondary};
   flex: 1;
   font-weight: 500;
-  font-size: ${designTokens.typography.fontSize.base};
+  font-size: ${designTokens.typography.fontSize.xs};
 `;
 
 export const LegendValue = styled.span`
   color: ${designTokens.colors.text.primary};
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  font-size: ${designTokens.typography.fontSize['2xl']};
-  min-width: 64px;
-  text-align: right;
-  letter-spacing: -0.02em;
+  font-size: ${designTokens.typography.fontSize.sm};
 `;
 
 export const ProgressList = styled.div`
@@ -342,17 +287,17 @@ export const SummaryValue = styled.span<{ $highlight?: boolean }>`
 export const RoleList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${designTokens.spacing.lg};
+  gap: ${designTokens.spacing.sm};
 `;
 
 export const RoleItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${designTokens.spacing.sm};
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: ${designTokens.spacing.xs};
+  transition: all 0.2s ease;
   
   &:hover {
-    transform: translateX(4px);
+    opacity: 0.8;
   }
 `;
 
@@ -364,65 +309,30 @@ export const RoleHeader = styled.div`
 
 export const RoleLabel = styled.span`
   color: ${designTokens.colors.text.secondary};
-  font-weight: ${designTokens.typography.fontWeight.semibold};
-  font-size: ${designTokens.typography.fontSize.base};
-  display: flex;
-  align-items: center;
-  gap: ${designTokens.spacing.xs};
-  
-  /* Add role badge */
-  &::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: ${designTokens.radius.full};
-    background: ${designTokens.colors.primary[400]};
-    box-shadow: 0 0 8px ${designTokens.colors.primary[400]}80;
-  }
+  font-weight: ${designTokens.typography.fontWeight.medium};
+  font-size: ${designTokens.typography.fontSize.xs};
 `;
 
 export const RoleValue = styled.span<{ $isHigh: boolean }>`
-  color: ${props => props.$isHigh ? designTokens.colors.status.success : designTokens.colors.text.primary};
-  font-weight: 700;
+  color: ${props => props.$isHigh ? '#10B981' : designTokens.colors.text.primary};
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  font-size: ${designTokens.typography.fontSize['2xl']};
-  min-width: 64px;
-  text-align: right;
-  letter-spacing: -0.02em;
+  font-size: ${designTokens.typography.fontSize.sm};
 `;
 
 export const RoleBarContainer = styled.div`
   width: 100%;
-  height: 12px;
-  background: ${designTokens.colors.background.primary};
+  height: 6px;
+  background: rgba(148, 163, 184, 0.1);
   border-radius: ${designTokens.radius.full};
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 export const RoleBar = styled.div<{ $width: number; $isHigh: boolean }>`
   height: 100%;
   width: ${props => props.$width}%;
-  background: ${props => props.$isHigh 
-    ? `linear-gradient(90deg, ${designTokens.colors.status.success}, #16a34a)`
-    : `linear-gradient(90deg, ${designTokens.colors.primary[400]}, ${designTokens.colors.primary[500]})`
-  };
+  background: ${props => props.$isHigh ? '#10B981' : designTokens.colors.primary[500]};
   border-radius: ${designTokens.radius.full};
-  transition: width ${designTokens.transitions.slow} ${designTokens.transitions.easing.easeOut};
-  box-shadow: ${props => props.$isHigh ? designTokens.shadows.glow : 'none'};
-  
-  /* Gestalt: Continuity - smooth visual flow */
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: ${designTokens.radius.full};
-  }
+  transition: width 0.6s ease-out;
 `;

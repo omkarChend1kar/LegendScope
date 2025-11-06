@@ -1,21 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  PageContainer,
-  ContentWrapper,
-  Header,
-  Title,
-  Subtitle,
-  EmotionTag,
+  AnalyticsContainer,
+  AnalyticsHeader,
+  HeaderTop,
+  AnalyticsTitle,
+  TimeRangeSelector,
+  TimeRangeButton,
+  AnalyticsContent,
+  MetricsGrid,
+  MetricCard,
+  MetricValue,
+  MetricLabel,
+  ChartsGrid,
+  ChartSection,
 } from '../styles/Layout.styles';
-import { TwoColumnGrid } from '../styles/Charts.styles';
-import { NarrativeSection, NarrativeText, CTAButton } from '../styles/Narrative.styles';
-import { StatisticsGrid } from './StatisticsGrid';
 import { TimelineSparkline } from './TimelineSparkline';
-import { DefiningMatchCard } from './DefiningMatchCard';
 import { ChampionDistributionChart } from './ChampionDistributionChart';
 import { RoleDistributionList } from './RoleDistributionList';
-import { ProgressSnapshot } from './ProgressSnapshot';
-import { ArrowRight } from 'lucide-react';
 
 // BLoC imports
 import { EchoesOfBattleRepositoryImpl } from '../../data/repositories/EchoesOfBattleRepository';
@@ -36,6 +37,8 @@ interface EchoesOfBattleContainerProps {
 }
 
 export const EchoesOfBattleContainer: React.FC<EchoesOfBattleContainerProps> = ({ playerId }) => {
+  const [timeRange, setTimeRange] = useState('1M');
+
   // Initialize repository and BLoCs (memoized to prevent recreation)
   const { statisticsBloc, timelineBloc, definingMatchBloc, distributionBloc, progressBloc } = useMemo(() => {
     const repository = new EchoesOfBattleRepositoryImpl(true); // Use mock data
@@ -59,10 +62,7 @@ export const EchoesOfBattleContainer: React.FC<EchoesOfBattleContainerProps> = (
   const distributionState = useDistributionBloc(distributionBloc, playerId);
   const progressState = useProgressBloc(progressBloc, playerId);
 
-  const handleCTAClick = () => {
-    console.log('Navigate to next section');
-    // TODO: Implement navigation to next section
-  };
+  const timeRanges = ['7D', '2W', '1M', '3M', '1Y'];
 
   // Loading state
   const isLoading = 
@@ -82,75 +82,108 @@ export const EchoesOfBattleContainer: React.FC<EchoesOfBattleContainerProps> = (
 
   if (isLoading) {
     return (
-      <PageContainer>
-        <ContentWrapper>
-          <Header>
-            <Title>Loading...</Title>
-            <Subtitle>Gathering your battle data</Subtitle>
-          </Header>
-        </ContentWrapper>
-      </PageContainer>
+      <AnalyticsContainer>
+        <AnalyticsHeader>
+          <HeaderTop>
+            <AnalyticsTitle>Loading...</AnalyticsTitle>
+          </HeaderTop>
+        </AnalyticsHeader>
+      </AnalyticsContainer>
     );
   }
 
   if (error) {
     return (
-      <PageContainer>
-        <ContentWrapper>
-          <Header>
-            <Title>Error</Title>
-            <Subtitle>{error}</Subtitle>
-          </Header>
-        </ContentWrapper>
-      </PageContainer>
+      <AnalyticsContainer>
+        <AnalyticsHeader>
+          <HeaderTop>
+            <AnalyticsTitle>Error: {error}</AnalyticsTitle>
+          </HeaderTop>
+        </AnalyticsHeader>
+      </AnalyticsContainer>
     );
   }
 
   return (
-    <PageContainer>
-      <ContentWrapper>
-        <Header>
-          <Title>Echoes of Battle</Title>
-          <Subtitle>A reflection of every triumph, every fall</Subtitle>
-          <EmotionTag>PRIDE · REFLECTION</EmotionTag>
-        </Header>
+    <AnalyticsContainer>
+      {/* Header with Title and Time Range Selector */}
+      <AnalyticsHeader>
+        <HeaderTop>
+          <AnalyticsTitle>Echoes of Battle</AnalyticsTitle>
+          <TimeRangeSelector>
+            {timeRanges.map((range) => (
+              <TimeRangeButton
+                key={range}
+                $active={timeRange === range}
+                onClick={() => setTimeRange(range)}
+              >
+                {range}
+              </TimeRangeButton>
+            ))}
+          </TimeRangeSelector>
+        </HeaderTop>
+      </AnalyticsHeader>
 
-        {statisticsState.statistics && (
-          <StatisticsGrid statistics={statisticsState.statistics} />
-        )}
-
+      {/* Main Content */}
+      <AnalyticsContent>
+        {/* Timeline Chart - Full Width at Top */}
         {timelineState.timeline && (
           <TimelineSparkline timeline={timelineState.timeline} />
         )}
 
-        {definingMatchState.match && (
-          <DefiningMatchCard match={definingMatchState.match} />
-        )}
-
-        <TwoColumnGrid>
+        {/* Charts Grid - Two smaller charts side by side */}
+        <ChartsGrid>
           {distributionState.championDistribution && (
-            <ChampionDistributionChart distribution={distributionState.championDistribution} />
+            <ChartSection>
+              <ChampionDistributionChart distribution={distributionState.championDistribution} />
+            </ChartSection>
           )}
+          
           {distributionState.roleDistribution && (
-            <RoleDistributionList distribution={distributionState.roleDistribution} />
+            <ChartSection>
+              <RoleDistributionList distribution={distributionState.roleDistribution} />
+            </ChartSection>
           )}
-        </TwoColumnGrid>
+        </ChartsGrid>
 
-        {progressState.progress && (
-          <ProgressSnapshot progress={progressState.progress} />
+        {/* Metrics Grid - 8 cards with narrative labels */}
+        {statisticsState.statistics && (
+          <MetricsGrid>
+            <MetricCard>
+              <MetricLabel>Battles Fought</MetricLabel>
+              <MetricValue>{statisticsState.statistics.totalGames}</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Trials Claimed</MetricLabel>
+              <MetricValue>{statisticsState.statistics.victories}</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Victory Echo</MetricLabel>
+              <MetricValue>{statisticsState.statistics.winRate.toFixed(1)}%</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Combat Mastery</MetricLabel>
+              <MetricValue>{statisticsState.statistics.kda.toFixed(2)}</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Legendary Moments</MetricLabel>
+              <MetricValue>{statisticsState.statistics.pentakills}</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Unbroken Streak</MetricLabel>
+              <MetricValue>{statisticsState.statistics.winStreak}</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Phoenix Rising</MetricLabel>
+              <MetricValue>{statisticsState.statistics.comebackPercentage}%</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>Steadfast Will</MetricLabel>
+              <MetricValue>{statisticsState.statistics.consistencyIndex}%</MetricValue>
+            </MetricCard>
+          </MetricsGrid>
         )}
-
-        <NarrativeSection>
-          <NarrativeText>
-            Every battle is a lesson. Every victory a testament. Each defeat shapes you into the
-            player you are today. Your journey through the Rift has been carved with precision,
-            determination, and resilience.
-          </NarrativeText>
-          <CTAButton onClick={handleCTAClick}>
-            Dive deeper into your story <ArrowRight size={18} />
-          </CTAButton>
-        </NarrativeSection>
-      </ContentWrapper>
-    </PageContainer>
+      </AnalyticsContent>
+    </AnalyticsContainer>
   );
 };

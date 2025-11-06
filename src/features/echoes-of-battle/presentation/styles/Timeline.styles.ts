@@ -8,9 +8,9 @@ export const TimelineSection = styled.div`
     rgba(15, 23, 42, 0.98) 100%
   );
   border: 1px solid ${designTokens.colors.border.default};
-  border-radius: ${designTokens.radius.xl};
-  padding: ${designTokens.spacing.xl};
-  margin-bottom: ${designTokens.spacing.xl};
+  border-radius: ${designTokens.radius.md};
+  padding: ${designTokens.spacing.md};
+  margin-bottom: ${designTokens.spacing.lg};
   transition: all ${designTokens.transitions.normal};
   
   &:hover {
@@ -20,7 +20,7 @@ export const TimelineSection = styled.div`
 `;
 
 export const TimelineTitle = styled.h3`
-  font-size: ${designTokens.typography.fontSize.lg};
+  font-size: ${designTokens.typography.fontSize.base};
   color: ${designTokens.colors.primary[400]};
   text-transform: uppercase;
   letter-spacing: ${designTokens.typography.letterSpacing.wide};
@@ -29,9 +29,9 @@ export const TimelineTitle = styled.h3`
 `;
 
 export const TimelineSubtitle = styled.p`
-  font-size: ${designTokens.typography.fontSize.sm};
+  font-size: ${designTokens.typography.fontSize.xs};
   color: ${designTokens.colors.text.tertiary};
-  margin: 0 0 ${designTokens.spacing.xl} 0;
+  margin: 0 0 ${designTokens.spacing.lg} 0;
   opacity: 0.8;
 `;
 
@@ -321,9 +321,9 @@ export const TimelineCaption = styled.p`
 
 export const RechartsContainer = styled.div`
   background: rgba(15, 23, 42, 0.4);
-  border-radius: ${designTokens.radius.lg};
-  padding: ${designTokens.spacing.xl};
-  margin-bottom: ${designTokens.spacing.lg};
+  border-radius: ${designTokens.radius.md};
+  padding: ${designTokens.spacing.md};
+  margin-bottom: ${designTokens.spacing.md};
   
   .recharts-surface {
     overflow: visible;
