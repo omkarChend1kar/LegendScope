@@ -23,9 +23,23 @@ import {
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 
+type ChartDatumValue = string | number | null | undefined;
+type ChartDatum = Record<string, ChartDatumValue>;
+
+interface TooltipPayloadItem {
+  name?: string;
+  value?: ChartDatumValue;
+  color?: string;
+}
+
+interface TooltipContext {
+  active?: boolean;
+  payload?: TooltipPayloadItem[];
+  label?: string | number;
+}
 
 interface BaseChartProps {
-  data: any[];
+  data: ChartDatum[];
   height?: number;
   showGrid?: boolean;
   showLegend?: boolean;
@@ -97,7 +111,7 @@ const ChartContainer = styled.div<{ height: number }>`
   }
 `;
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip: React.FC<TooltipContext> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div style={{
@@ -110,12 +124,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p style={{ color: theme.colors.primary.lightGold, margin: '0 0 8px 0' }}>
           {label}
         </p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index) => (
           <p key={index} style={{ 
             color: entry.color || theme.colors.neutral.lightGray,
             margin: '4px 0' 
           }}>
-            {`${entry.name}: ${entry.value}`}
+            {`${entry.name ?? 'Value'}: ${entry.value ?? '--'}`}
           </p>
         ))}
       </div>
@@ -260,8 +274,8 @@ export const Chart: React.FC<ChartProps> = ({
         const pieProps = props as Omit<PieChartProps, 'type'>;
         const colors = pieProps.colors || [
           theme.colors.primary.gold,
-          theme.colors.accent.purple,
-          theme.colors.secondary.blue,
+          theme.colors.accent.ethereal,
+          theme.colors.secondary.indigoMist,
           theme.colors.roles.adc,
           theme.colors.roles.support,
         ];

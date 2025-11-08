@@ -1,7 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePlayerStore } from '../store';
 import { riotApiService, analyticsService } from '../services/api';
-import type { Player, PlayerInsights, ProgressData, YearEndSummary, Region, TimeFrame } from '../types';
+import type {
+  Player,
+  PlayerInsights,
+  ProgressData,
+  YearEndSummary,
+  Region,
+  TimeFrame,
+  Match,
+  LeagueEntry,
+} from '../types';
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  if (error instanceof Error) {
+    return error.message || fallback;
+  }
+
+  if (typeof error === 'string') {
+    return error || fallback;
+  }
+
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string') {
+      return message || fallback;
+    }
+  }
+
+  return fallback;
+};
 
 interface UsePlayerDataReturn {
   player: Player | null;
@@ -52,7 +80,8 @@ export const usePlayerData = (): UsePlayerDataReturn => {
       const rankResponse = await riotApiService.getPlayerRank(playerResponse.data.id, region);
       
       if (rankResponse.success && rankResponse.data.length > 0) {
-        const soloQueueRank = rankResponse.data.find((entry: any) => 
+  const rankEntries: LeagueEntry[] = rankResponse.data;
+        const soloQueueRank = rankEntries.find((entry) =>
           entry.queueType === 'RANKED_SOLO_5x5'
         );
         
@@ -65,8 +94,8 @@ export const usePlayerData = (): UsePlayerDataReturn => {
 
       setCurrentPlayer(playerResponse.data);
       return true;
-    } catch (error: any) {
-      setError(error.message || 'An unexpected error occurred');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'An unexpected error occurred'));
       return false;
     } finally {
       setLocalLoading(false);
@@ -87,11 +116,11 @@ export const usePlayerData = (): UsePlayerDataReturn => {
 
       if (matchHistoryResponse.success) {
         // Fetch match details (simplified - in real app you'd fetch all matches)
-        const matches: any[] = []; // Would populate with actual match data
-        
+        const matches: Match[] = [];
+
         // Generate insights based on match data
         const insightsResponse = await analyticsService.generatePlayerInsights(
-          player.puuid, 
+          player.puuid,
           matches
         );
 
@@ -99,7 +128,7 @@ export const usePlayerData = (): UsePlayerDataReturn => {
           setInsights(insightsResponse.data);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching player insights:', error);
     }
   }, [setInsights]);
@@ -116,7 +145,7 @@ export const usePlayerData = (): UsePlayerDataReturn => {
       if (progressResponse.success) {
         setProgressData(progressResponse.data);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching progress data:', error);
     }
   }, [setProgressData]);
@@ -133,7 +162,7 @@ export const usePlayerData = (): UsePlayerDataReturn => {
       if (summaryResponse.success) {
         setYearEndSummary(summaryResponse.data);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching year-end summary:', error);
     }
   }, [setYearEndSummary]);
@@ -150,8 +179,8 @@ export const usePlayerData = (): UsePlayerDataReturn => {
         fetchProgressData(currentPlayer, selectedTimeframe),
         fetchYearEndSummary(currentPlayer, new Date().getFullYear()),
       ]);
-    } catch (error: any) {
-      setError(error.message || 'Error refreshing data');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Error refreshing data'));
     } finally {
       setLoading(false);
     }
@@ -237,16 +266,35 @@ export const useSocialFeatures = () => {
     }
   }, [addFriend]);
 
-  const generateShareableContent = useCallback((type: 'achievement' | 'highlight' | 'improvement', data: any) => {
-    // Generate shareable content for social platforms
-    const templates = {
-      achievement: `🏆 Just unlocked a new achievement in League of Legends! ${data.title} - ${data.description} #LeagueOfLegends #Gaming`,
-      highlight: `⚔️ Amazing game highlight! ${data.champion} - ${data.kda} KDA in a ${data.result} match! #LeagueOfLegends #Highlight`,
-      improvement: `📈 My ${data.skill} improved by ${data.change}% this month! Getting better every game 💪 #LeagueOfLegends #Progress`,
-    };
+  type ShareableContentType = 'achievement' | 'highlight' | 'improvement';
 
-    return templates[type] || 'Check out my League of Legends stats!';
-  }, []);
+  type ShareableContentDataMap = {
+    achievement: { title: string; description: string };
+    highlight: { champion: string; kda: string; result: string };
+    improvement: { skill: string; change: number };
+  };
+
+  const generateShareableContent = useCallback(
+    <T extends ShareableContentType>(type: T, data: ShareableContentDataMap[T]) => {
+      switch (type) {
+        case 'achievement': {
+          const payload = data as ShareableContentDataMap['achievement'];
+          return `🏆 Just unlocked a new achievement in League of Legends! ${payload.title} - ${payload.description} #LeagueOfLegends #Gaming`;
+        }
+        case 'highlight': {
+          const payload = data as ShareableContentDataMap['highlight'];
+          return `⚔️ Amazing game highlight! ${payload.champion} - ${payload.kda} KDA in a ${payload.result} match! #LeagueOfLegends #Highlight`;
+        }
+        case 'improvement': {
+          const payload = data as ShareableContentDataMap['improvement'];
+          return `📈 My ${payload.skill} improved by ${payload.change}% this month! Getting better every game 💪 #LeagueOfLegends #Progress`;
+        }
+        default:
+          return 'Check out my League of Legends stats!';
+      }
+    },
+    []
+  );
 
   return {
     friends,

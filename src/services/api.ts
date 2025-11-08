@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, AxiosError } from 'axios';
 import type { 
   Player, 
   Match, 
@@ -8,8 +8,55 @@ import type {
   YearEndSummary,
   ApiResponse,
   PaginatedResponse,
-  Region 
+  Region,
+  LeagueEntry,
+  TimeFrame,
+  Tier,
+  Rank,
 } from '../types';
+
+interface RiotLeagueEntry {
+  queueType: string;
+  tier: string;
+  rank: string;
+  leaguePoints: number;
+  wins?: number;
+  losses?: number;
+}
+
+const isAxiosError = (error: unknown): error is AxiosError =>
+  typeof error === 'object' && error !== null && (error as AxiosError).isAxiosError === true;
+
+const resolveErrorMessage = (error: unknown, fallback: string): string => {
+  if (isAxiosError(error)) {
+    const statusMessage = (
+      error.response?.data as { status?: { message?: string } } | undefined
+    )?.status?.message;
+    if (typeof statusMessage === 'string' && statusMessage.trim().length > 0) {
+      return statusMessage;
+    }
+    if (typeof error.message === 'string' && error.message.trim().length > 0) {
+      return error.message;
+    }
+  }
+
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  if (typeof error === 'string' && error.trim().length > 0) {
+    return error;
+  }
+
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string' && message.trim().length > 0) {
+      return message;
+    }
+  }
+
+  return fallback;
+};
 
 class RiotAPIService {
   private api: AxiosInstance;
@@ -88,17 +135,17 @@ class RiotAPIService {
         data: player,
         timestamp: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: {} as Player,
-        error: error.response?.data?.status?.message || 'Failed to fetch player data',
+        error: resolveErrorMessage(error, 'Failed to fetch player data'),
         timestamp: Date.now(),
       };
     }
   }
 
-  async getPlayerRank(summonerId: string, region: Region): Promise<ApiResponse<any>> {
+  async getPlayerRank(summonerId: string, region: Region): Promise<ApiResponse<LeagueEntry[]>> {
     try {
       const baseUrl = this.getBaseUrl(region);
       const response = await this.api.get(
@@ -107,14 +154,21 @@ class RiotAPIService {
 
       return {
         success: true,
-        data: response.data,
+        data: (response.data as RiotLeagueEntry[]).map((entry) => ({
+          queueType: entry.queueType,
+          tier: entry.tier as Tier,
+          rank: entry.rank as Rank,
+          leaguePoints: entry.leaguePoints,
+          wins: entry.wins,
+          losses: entry.losses,
+        })),
         timestamp: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        data: null,
-        error: error.response?.data?.status?.message || 'Failed to fetch rank data',
+        data: [],
+        error: resolveErrorMessage(error, 'Failed to fetch rank data'),
         timestamp: Date.now(),
       };
     }
@@ -143,7 +197,7 @@ class RiotAPIService {
           hasMore: response.data.length === count,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: [],
@@ -153,7 +207,7 @@ class RiotAPIService {
           total: 0,
           hasMore: false,
         },
-        error: error.response?.data?.status?.message || 'Failed to fetch match history',
+        error: resolveErrorMessage(error, 'Failed to fetch match history'),
       };
     }
   }
@@ -168,11 +222,11 @@ class RiotAPIService {
         data: response.data,
         timestamp: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: {} as Match,
-        error: error.response?.data?.status?.message || 'Failed to fetch match details',
+        error: resolveErrorMessage(error, 'Failed to fetch match details'),
         timestamp: Date.now(),
       };
     }
@@ -200,8 +254,10 @@ class RiotAPIService {
 // Mock Analytics Service (since we don't have access to internal Riot analytics)
 class AnalyticsService {
   // This would typically connect to a backend service that analyzes match data
-  async generatePlayerInsights(puuid: string, _matches: Match[]): Promise<ApiResponse<PlayerInsights>> {
+  async generatePlayerInsights(puuid: string, matches: Match[]): Promise<ApiResponse<PlayerInsights>> {
     try {
+      const analyzedMatches = matches.length;
+
       // Mock implementation - in a real app, this would be a sophisticated analysis
       const insights: PlayerInsights = {
         playerId: puuid,
@@ -210,7 +266,10 @@ class AnalyticsService {
             category: 'mechanical',
             description: 'Excellent CS per minute in laning phase',
             score: 85,
-            evidence: ['Averages 7.2 CS/min across last 20 games'],
+            evidence: [
+              'Averages 7.2 CS/min across last 20 games',
+              `Analyzed ${analyzedMatches} recent matches`,
+            ],
             trend: 'improving',
           },
           {
@@ -258,22 +317,22 @@ class AnalyticsService {
         data: insights,
         timestamp: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: {} as PlayerInsights,
-        error: 'Failed to generate player insights',
+        error: resolveErrorMessage(error, 'Failed to generate player insights'),
         timestamp: Date.now(),
       };
     }
   }
 
-  async generateProgressData(puuid: string, timeframe: string): Promise<ApiResponse<ProgressData>> {
+  async generateProgressData(puuid: string, timeframe: TimeFrame): Promise<ApiResponse<ProgressData>> {
     try {
       // Mock progress data
       const progressData: ProgressData = {
         playerId: puuid,
-        timeframe: timeframe as any,
+        timeframe,
         rankProgress: [],
         skillProgress: [],
         championProgress: [],
@@ -284,11 +343,11 @@ class AnalyticsService {
         data: progressData,
         timestamp: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: {} as ProgressData,
-        error: 'Failed to generate progress data',
+        error: resolveErrorMessage(error, 'Failed to generate progress data'),
         timestamp: Date.now(),
       };
     }
@@ -321,11 +380,11 @@ class AnalyticsService {
         data: summary,
         timestamp: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         data: {} as YearEndSummary,
-        error: 'Failed to generate year-end summary',
+        error: resolveErrorMessage(error, 'Failed to generate year-end summary'),
         timestamp: Date.now(),
       };
     }

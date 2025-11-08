@@ -43,6 +43,15 @@ LegendScope is a comprehensive React TypeScript web application that provides Le
    ```bash
    # Add your Riot Games API key for live data
    echo "VITE_RIOT_API_KEY=your_api_key_here" >> .env
+   
+   # Point the frontend at the LegendScope backend (defaults to http://localhost:3000/api)
+   echo "VITE_LEGENDSCOPE_API_BASE_URL=http://localhost:3000/api" >> .env
+
+   # Toggle Echoes of Battle mock data (defaults to backend; set to true to force mocks)
+   echo "VITE_EOB_USE_MOCK_DATA=true" >> .env
+
+   # Toggle onboarding mock data (set to false to query the backend profile API)
+   echo "VITE_ONBOARDING_USE_MOCK_DATA=false" >> .env
    ```
 
 3. **Start the development server**

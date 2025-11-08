@@ -2,15 +2,7 @@ import { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Sidebar, type SectionId } from '../components/navigation/Sidebar';
 import { EchoesOfBattle } from './sections/EchoesOfBattle';
-
-interface PlayerData {
-  riotId: string;
-  region: string;
-  summoner: {
-    name: string;
-    level: number;
-  };
-}
+import type { PlayerData } from '../types/PlayerData';
 
 interface JourneyDashboardProps {
   playerData: PlayerData | null;
@@ -39,7 +31,7 @@ export const JourneyDashboard: React.FC<JourneyDashboardProps> = ({ playerData, 
   const renderSection = () => {
     switch (activeSection) {
       case 'echoes':
-        return <EchoesOfBattle />;
+        return <EchoesOfBattle playerData={playerData} />;
       case 'patterns':
         return <PlaceholderSection title="Patterns Beneath the Chaos" />;
       case 'arc':
@@ -53,7 +45,7 @@ export const JourneyDashboard: React.FC<JourneyDashboardProps> = ({ playerData, 
       case 'voice':
         return <PlaceholderSection title="Voice in the Fog" />;
       default:
-        return <EchoesOfBattle />;
+        return <EchoesOfBattle playerData={playerData} />;
     }
   };
 

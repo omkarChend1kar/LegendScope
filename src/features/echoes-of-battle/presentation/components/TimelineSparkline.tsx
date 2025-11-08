@@ -33,15 +33,26 @@ export const TimelineSparkline: React.FC<TimelineSparklineProps> = ({ timeline }
     point.games > max.games ? point : max
   );
 
+  interface TimelineChartDatum {
+    month: string;
+    games: number;
+    fullMonth: string;
+  }
+
   // Format data for Recharts
-  const chartData = timeline.dataPoints.map(point => ({
+  const chartData: TimelineChartDatum[] = timeline.dataPoints.map(point => ({
     month: point.month.substring(0, 3),
     games: point.games,
     fullMonth: point.month,
   }));
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface TimelineTooltipEntry {
+    payload: TimelineChartDatum;
+    value?: number;
+  }
+
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: TimelineTooltipEntry[] }) => {
     if (active && payload && payload.length) {
       return (
         <div style={{

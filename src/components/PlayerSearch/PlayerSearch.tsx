@@ -7,7 +7,17 @@ import { usePlayerData } from '../../hooks/usePlayerData';
 import type { Region } from '../../types';
 
 interface PlayerSearchProps {
-  onPlayerFound?: (player: any) => void;
+  onPlayerFound?: (player: PlayerSummary) => void;
+}
+
+interface PlayerSummary {
+  name: string;
+  region: Region;
+}
+
+interface RecentSearch {
+  name: string;
+  region: Region;
 }
 
 const SearchContainer = styled.div`
@@ -89,7 +99,7 @@ const Select = styled.select`
 `;
 
 const ErrorMessage = styled.div`
-  color: ${theme.colors.status.error};
+  color: ${theme.colors.status.struggle};
   font-size: ${theme.typography.fontSize.sm};
   text-align: center;
   padding: ${theme.spacing.sm};
@@ -114,7 +124,7 @@ const RecentSearch = styled.button`
   border-radius: ${theme.borderRadius.lg};
   color: ${theme.colors.neutral.lightGray};
   font-size: ${theme.typography.fontSize.sm};
-  transition: all ${theme.animations.transition.fast};
+  transition: all ${theme.animations.transition.whisper};
   
   &:hover {
     background: rgba(200, 170, 110, 0.1);
@@ -141,10 +151,10 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({ onPlayerFound }) => 
   const [summonerName, setSummonerName] = useState('');
   const [selectedRegion, setSelectedRegion] = useState<Region>('na1');
   const [localError, setLocalError] = useState('');
-  const [recentSearches] = useState([
-    { name: 'Faker', region: 'kr' as Region },
-    { name: 'Doublelift', region: 'na1' as Region },
-    { name: 'Caps', region: 'euw1' as Region },
+  const [recentSearches] = useState<RecentSearch[]>([
+    { name: 'Faker', region: 'kr' },
+    { name: 'Doublelift', region: 'na1' },
+    { name: 'Caps', region: 'euw1' },
   ]);
 
   const { searchPlayer, isLoading, error } = usePlayerData();

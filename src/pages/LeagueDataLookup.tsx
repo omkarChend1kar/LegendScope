@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
-import {
-  Search,
-  AlertCircle,
-  CheckCircle,
-  Globe,
-  Swords
-} from 'lucide-react';
+import { Search, AlertCircle, CheckCircle, Globe, Swords } from 'lucide-react';
+import { OnboardingRepositoryImpl } from '../features/onboarding/data/repositories/OnboardingRepository';
+import { LookupPlayerProfileUseCase } from '../features/onboarding/domain/usecases/LookupPlayerProfileUseCase';
+import { OnboardingBloc, useOnboardingBloc } from '../features/onboarding/presentation/bloc/OnboardingBloc';
+import type { PlayerData } from '../types/PlayerData';
+import type { BackendStatus } from '../types/BackendStatus';
+import { setStoredPlayerProfile } from '../utils/playerProfileStorage';
 
 // Page Container
 const PageContainer = styled.div`
@@ -271,27 +271,6 @@ const SearchButton = styled.button`
   }
 `;
 
-interface SummonerData {
-  summoner: {
-    name: string;
-    level: number;
-  };
-  topChampions?: Array<{
-    championId: number;
-    championLevel: number;
-    championPoints: number;
-  }>;
-}
-
-interface PlayerData {
-  riotId: string;
-  region: string;
-  summoner: {
-    name: string;
-    level: number;
-  };
-}
-
 interface LeagueDataLookupProps {
   onPlayerFound: (data: PlayerData) => void;
 }
@@ -318,11 +297,18 @@ const regions = [
 export const LeagueDataLookup: React.FC<LeagueDataLookupProps> = ({ onPlayerFound }) => {
   const [riotId, setRiotId] = useState('');
   const [region, setRegion] = useState('na1');
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
 
-  // Mock API URL - in production this would be your Lambda function URL
-  const RIOT_API_URL = import.meta.env.VITE_RIOT_API_URL || 'https://khqf3gvliey6fdtnsysunoi6su0qhmyx.lambda-url.eu-north-1.on.aws';
+  const useMockOnboardingData = (import.meta.env.VITE_ONBOARDING_USE_MOCK_DATA ?? 'false') === 'true';
+
+  const onboardingBloc = useMemo(() => {
+    const repository = new OnboardingRepositoryImpl(useMockOnboardingData);
+    const useCase = new LookupPlayerProfileUseCase(repository);
+    return new OnboardingBloc(useCase);
+  }, [useMockOnboardingData]);
+
+  const { state: onboardingState, lookup } = useOnboardingBloc(onboardingBloc);
+  const loading = onboardingState.loading;
 
   const showMessage = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage({ text, type });
@@ -333,103 +319,58 @@ export const LeagueDataLookup: React.FC<LeagueDataLookupProps> = ({ onPlayerFoun
   };
 
   const handleLookup = async () => {
-    if (!riotId.trim()) {
+    const trimmedRiotId = riotId.trim();
+
+    if (!trimmedRiotId) {
       showMessage('Please enter a Riot ID', 'error');
       return;
     }
 
-    if (!riotId.includes('#')) {
+    if (!trimmedRiotId.includes('#')) {
       showMessage('Please use Riot ID format: GameName#TAG', 'error');
       return;
     }
 
-    setLoading(true);
     setMessage(null);
 
     try {
-      // Mock API response for testing - change to true to use mock data
-      const useMockData = true;
-      
-      if (useMockData) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+      const profile = await lookup({ riotId: trimmedRiotId, region });
+      const lastMatchesSuffix = profile.lastMatchesStatus !== 'READY'
+        ? ` Recent matches status: ${profile.lastMatchesStatus}.`
+        : '';
 
-        // Mock successful response
-        const mockData: SummonerData = {
-          summoner: {
-            name: riotId.split('#')[0],
-            level: Math.floor(Math.random() * 300) + 50
-          },
-          topChampions: [
-            {
-              championId: 51, // Caitlyn
-              championLevel: 7,
-              championPoints: 234567
-            },
-            {
-              championId: 222, // Jinx  
-              championLevel: 6,
-              championPoints: 189432
-            },
-            {
-              championId: 67, // Vayne
-              championLevel: 5,
-              championPoints: 156789
-            }
-          ]
-        };
+      const playerProfile: PlayerData = {
+        riotId: profile.riotId,
+        puuid: profile.puuid,
+        region: profile.region,
+        summoner: {
+          name: profile.summonerName,
+          level: profile.summonerLevel,
+          profileIconId: profile.profileIconId,
+        },
+        lastMatchesStatus: profile.lastMatchesStatus as BackendStatus,
+      };
 
-        showMessage('Summoner found! Redirecting to dashboard...', 'success');
-        
-        // Navigate to dashboard after short delay
-        setTimeout(() => {
-          onPlayerFound({
-            riotId: riotId,
-            region: region,
-            summoner: mockData.summoner
-          });
-        }, 1500);
-      } else {
-        // Real API call
-        const response = await fetch(RIOT_API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            riotId: riotId,
-            region: region
-          })
-        });
+      setStoredPlayerProfile(playerProfile);
 
-        const data = await response.json();
+      showMessage(
+        `Summoner found! Redirecting to dashboard...${lastMatchesSuffix}`,
+        profile.lastMatchesStatus === 'READY' ? 'success' : 'info'
+      );
 
-        if (response.ok) {
-          showMessage('Summoner found! Redirecting to dashboard...', 'success');
-          
-          // Navigate to dashboard after short delay
-          setTimeout(() => {
-            onPlayerFound({
-              riotId: riotId,
-              region: region,
-              summoner: data.summoner
-            });
-          }, 1500);
-        } else {
-          showMessage(data.error || 'Failed to fetch summoner data', 'error');
-        }
-      }
+      setTimeout(() => {
+        onPlayerFound(playerProfile);
+      }, 1200);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Network error. Please try again.';
       console.error('Error:', error);
-      showMessage('Network error. Please try again.', 'error');
-    } finally {
-      setLoading(false);
+      showMessage(message, 'error');
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !loading) {
-      handleLookup();
+      void handleLookup();
     }
   };
 

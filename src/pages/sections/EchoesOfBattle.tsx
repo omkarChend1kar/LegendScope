@@ -1,9 +1,29 @@
 import React from 'react';
 import { EchoesOfBattleContainer } from '../../features/echoes-of-battle/presentation/components/EchoesOfBattleContainer';
+import type { PlayerData } from '../../types/PlayerData';
 
-export const EchoesOfBattle: React.FC = () => {
-  // TODO: Get playerId from context or props
-  const playerId = 'player123';
+interface EchoesOfBattleProps {
+  playerData: PlayerData | null;
+}
 
-  return <EchoesOfBattleContainer playerId={playerId} />;
+export const EchoesOfBattle: React.FC<EchoesOfBattleProps> = ({ playerData }) => {
+  if (!playerData?.puuid) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '60vh',
+          color: '#fbbf24',
+          fontSize: '1.1rem',
+          textAlign: 'center',
+        }}
+      >
+        Link your Summoner profile from the Summoner&apos;s Gate to unlock your Echoes of Battle.
+      </div>
+    );
+  }
+
+  return <EchoesOfBattleContainer playerId={playerData.puuid} />;
 };

@@ -1,72 +1,10 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
-import { 
-  Swords, 
-  Brain, 
-  TrendingUp, 
-  AlertTriangle, 
-  Users, 
-  Award, 
-  MessageCircle,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
-
-// Navigation items configuration
-export const NAVIGATION_SECTIONS = [
-  {
-    id: 'echoes',
-    title: 'Echoes of Battle',
-    subtitle: 'Your legacy in numbers',
-    icon: Swords,
-    emotion: 'Pride, reflection',
-  },
-  {
-    id: 'patterns',
-    title: 'Patterns Beneath the Chaos',
-    subtitle: 'Your signature playstyle',
-    icon: Brain,
-    emotion: 'Curiosity',
-  },
-  {
-    id: 'arc',
-    title: 'The Arc',
-    subtitle: 'Journey through time',
-    icon: TrendingUp,
-    emotion: 'Growth',
-  },
-  {
-    id: 'faultlines',
-    title: 'Faultlines',
-    subtitle: 'Strengths and shadows',
-    icon: AlertTriangle,
-    emotion: 'Motivation, humility',
-  },
-  {
-    id: 'rift',
-    title: 'The Rift Between Us',
-    subtitle: 'Among your peers',
-    icon: Users,
-    emotion: 'Belonging, rivalry',
-  },
-  {
-    id: 'fragments',
-    title: 'Fragments of Glory',
-    subtitle: 'Moments worth sharing',
-    icon: Award,
-    emotion: 'Celebration',
-  },
-  {
-    id: 'voice',
-    title: 'Voice in the Fog',
-    subtitle: 'Your AI companion',
-    icon: MessageCircle,
-    emotion: 'Inspiration',
-  },
-] as const;
-
-export type SectionId = typeof NAVIGATION_SECTIONS[number]['id'];
+import { ChevronLeft, ChevronRight, Swords } from 'lucide-react';
+import { NAVIGATION_SECTIONS } from './Sidebar.config';
+import type { SectionId } from './Sidebar.config';
+import type { PlayerData } from '../../types/PlayerData';
 
 // Styled Components
 const SidebarContainer = styled.aside<{ $collapsed: boolean }>`
@@ -280,15 +218,6 @@ const RankBadge = styled.span`
   border-radius: 0.25rem;
 `;
 
-interface PlayerData {
-  riotId: string;
-  region: string;
-  summoner: {
-    name: string;
-    level: number;
-  };
-}
-
 interface SidebarProps {
   activeSection: SectionId;
   onSectionChange: (section: SectionId) => void;
@@ -365,3 +294,5 @@ export const Sidebar = ({ activeSection, onSectionChange, playerData }: SidebarP
     </SidebarContainer>
   );
 };
+
+export type { SectionId };

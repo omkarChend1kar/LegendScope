@@ -8,22 +8,39 @@ interface RoleDistributionListProps {
   distribution: RoleDistribution;
 }
 
+interface RoleDistributionChartDatum {
+  name: string;
+  wins: number;
+  losses: number;
+  winRate: number;
+}
+
+interface RoleChartTooltipPayload {
+  value?: number;
+}
+
+interface RoleChartTooltipProps {
+  active?: boolean;
+  label?: string | number;
+  payload?: RoleChartTooltipPayload[];
+}
+
 export const RoleDistributionList: React.FC<RoleDistributionListProps> = ({ distribution }) => {
   // Transform data to show wins vs losses side by side
-  const chartData = distribution.roles.map((role) => ({
+  const chartData: RoleDistributionChartDatum[] = distribution.roles.map((role) => ({
     name: role.role,
     wins: Math.round(role.games * (role.winRate / 100)),
     losses: role.games - Math.round(role.games * (role.winRate / 100)),
     winRate: role.winRate,
   }));
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: RoleChartTooltipProps) => {
     if (active && payload && payload.length) {
-      const wins = payload[0]?.value || 0;
-      const losses = payload[1]?.value || 0;
+      const wins = payload[0]?.value ?? 0;
+      const losses = payload[1]?.value ?? 0;
       const total = wins + losses;
       const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
-      
+
       return (
         <div style={{
           background: 'rgba(15, 23, 42, 0.98)',

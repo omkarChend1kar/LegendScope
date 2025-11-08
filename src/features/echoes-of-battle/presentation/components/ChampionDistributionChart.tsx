@@ -8,6 +8,18 @@ interface ChampionDistributionChartProps {
   distribution: ChampionDistribution;
 }
 
+type ChampionChartDatum = {
+  name: string;
+  games: number;
+  percentage: number;
+  fill: string;
+};
+
+interface ChampionTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number; payload: ChampionChartDatum }>;
+}
+
 export const ChampionDistributionChart: React.FC<ChampionDistributionChartProps> = ({ distribution }) => {
   // Transform data for horizontal bar chart
   const chartData = distribution.champions.map((champion) => ({
@@ -17,8 +29,11 @@ export const ChampionDistributionChart: React.FC<ChampionDistributionChartProps>
     fill: champion.color,
   }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip: React.FC<ChampionTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const { name, percentage } = payload[0].payload;
+      const battles = payload[0].value;
+
       return (
         <div style={{
           background: 'rgba(15, 23, 42, 0.98)',
@@ -27,10 +42,10 @@ export const ChampionDistributionChart: React.FC<ChampionDistributionChartProps>
           padding: '8px 12px',
         }}>
           <p style={{ color: designTokens.colors.text.primary, fontSize: '12px', margin: 0, fontWeight: 600 }}>
-            {payload[0].payload.name}
+            {name}
           </p>
           <p style={{ color: designTokens.colors.primary[400], fontSize: '11px', margin: '4px 0 0' }}>
-            {payload[0].value} battles ({payload[0].payload.percentage.toFixed(1)}%)
+            {battles} battles ({percentage.toFixed(1)}%)
           </p>
         </div>
       );

@@ -122,7 +122,7 @@ export interface PlaystyleAnalysis {
 // Progress and Historical Data Types
 export interface ProgressData {
   playerId: string;
-  timeframe: 'week' | 'month' | 'season' | 'year';
+  timeframe: TimeFrame;
   rankProgress: RankProgress[];
   skillProgress: SkillProgress[];
   championProgress: ChampionProgress[];
@@ -222,6 +222,15 @@ export interface Achievement {
   category: string;
 }
 
+export interface LeagueEntry {
+  queueType: string;
+  tier: Tier;
+  rank: Rank;
+  leaguePoints: number;
+  wins?: number;
+  losses?: number;
+}
+
 export interface RankJourney {
   startRank: {
     tier: string;
@@ -255,7 +264,7 @@ export interface SocialPost {
   type: 'achievement' | 'highlight' | 'improvement' | 'comparison';
   content: string;
   imageUrl?: string;
-  data: Record<string, any>;
+  data: Record<string, string | number | boolean | null | undefined | string[] | number[]>;
   platform: 'twitter' | 'discord' | 'reddit' | 'instagram';
   createdAt: string;
   likes: number;
