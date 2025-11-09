@@ -52,6 +52,12 @@ LegendScope is a comprehensive React TypeScript web application that provides Le
 
    # Toggle onboarding mock data (set to false to query the backend profile API)
    echo "VITE_ONBOARDING_USE_MOCK_DATA=false" >> .env
+
+   # Persisted query cache versioning (bump to invalidate local IndexedDB cache)
+   echo "VITE_CACHE_VERSION=v1" >> .env
+
+   # Toggle Patterns Beneath the Chaos mock data feed
+   echo "VITE_PATTERNS_USE_MOCK_DATA=true" >> .env
    ```
 
 3. **Start the development server**
@@ -96,6 +102,13 @@ src/
 - **State Management**: Zustand for efficient, simple state management
 - **Styled Components**: CSS-in-JS with League of Legends theming
 - **Responsive Design**: Mobile-first approach with breakpoint system
+- **Offline-First Caching**: TanStack Query persisted to IndexedDB for resilient UX
+
+#### Echoes of Battle Offline Sync
+
+- **Dexie-Powered Local Store**: Echoes of Battle summary sections are persisted in IndexedDB via Dexie so the last-known data renders instantly—even without a network connection.
+- **Remote/Local Repository Sync**: Each repository call first serves the Dexie snapshot while kicking off a background fetch that reconciles the local store once the backend responds.
+- **Status-Aware Updates**: Sections stay in `FETCHING` until a remote result lands, ensuring React Query simply polls the local store until fresh data arrives.
 
 ## 🎨 Design System
 
@@ -117,6 +130,7 @@ src/
 - **Vite** - Lightning-fast build tool
 - **Styled Components** - CSS-in-JS styling
 - **Zustand** - Lightweight state management
+- **TanStack Query** - Offline-first data fetching & caching
 - **Recharts** - Data visualization library
 - **Framer Motion** - Smooth animations
 - **Lucide React** - Beautiful icon library

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Sidebar, type SectionId } from '../components/navigation/Sidebar';
 import { EchoesOfBattle } from './sections/EchoesOfBattle';
+import { PatternsBeneathChaos } from './sections/PatternsBeneathChaos';
 import type { PlayerData } from '../types/PlayerData';
 
 interface JourneyDashboardProps {
@@ -33,7 +34,7 @@ export const JourneyDashboard: React.FC<JourneyDashboardProps> = ({ playerData, 
       case 'echoes':
         return <EchoesOfBattle playerData={playerData} />;
       case 'patterns':
-        return <PlaceholderSection title="Patterns Beneath the Chaos" />;
+        return <PatternsBeneathChaos playerData={playerData} />;
       case 'arc':
         return <PlaceholderSection title="The Arc" />;
       case 'faultlines':

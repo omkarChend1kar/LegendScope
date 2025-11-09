@@ -49,7 +49,7 @@ const getButtonStyles = (variant: ButtonProps['variant']) => {
         border: 2px solid transparent;
         
         &:hover {
-          box-shadow: ${theme.shadows.purpleGlow};
+          box-shadow: ${theme.shadows.glow};
         }
       `;
       
@@ -105,7 +105,7 @@ const StyledButton = styled.button<ButtonProps>`
   justify-content: center;
   gap: ${theme.spacing.xs};
   
-  font-family: ${theme.typography.fontFamily.secondary};
+  font-family: ${theme.typography.fontFamily.sans};
   font-weight: ${theme.typography.fontWeight.medium};
   text-decoration: none;
   

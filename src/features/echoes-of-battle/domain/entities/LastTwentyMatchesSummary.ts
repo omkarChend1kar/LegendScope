@@ -30,23 +30,8 @@ export interface ChampionSummary {
   color: string;
 }
 
-export interface RiskProfile {
-  earlyAggression: number;
-  earlyFalls: number;
-  objectiveControl: number;
-  visionCommitment: number;
-  narrative: string;
-}
-
-export interface NarrativeSummary {
-  headline: string;
-  body: string;
-}
-
 export interface LastTwentyMatchesSummarySnapshot {
   summaryCards: SummaryCard;
   roles: RoleSummary[];
   champions: ChampionSummary[];
-  riskProfile: RiskProfile;
-  narrative: NarrativeSummary;
 }

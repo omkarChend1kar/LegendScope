@@ -1,16 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type {
   SummaryCard,
   RoleSummary,
   ChampionSummary,
-  RiskProfile,
-  NarrativeSummary,
 } from '../../domain/entities/LastTwentyMatchesSummary';
 import { GetLastTwentySummaryCardsUseCase } from '../../domain/usecases/GetLastTwentySummaryCardsUseCase';
 import { GetLastTwentyRoleSummariesUseCase } from '../../domain/usecases/GetLastTwentyRoleSummariesUseCase';
 import { GetLastTwentyChampionSummariesUseCase } from '../../domain/usecases/GetLastTwentyChampionSummariesUseCase';
-import { GetLastTwentyRiskProfileUseCase } from '../../domain/usecases/GetLastTwentyRiskProfileUseCase';
-import { GetLastTwentyNarrativeUseCase } from '../../domain/usecases/GetLastTwentyNarrativeUseCase';
 import type { SummarySection } from '../../types/SummarySection';
 import { isInProgressStatus } from '../../types/SummarySection';
 
@@ -18,8 +14,6 @@ type SummarySections = {
   summaryCards: SummarySection<SummaryCard>;
   roles: SummarySection<RoleSummary[]>;
   champions: SummarySection<ChampionSummary[]>;
-  riskProfile: SummarySection<RiskProfile>;
-  narrative: SummarySection<NarrativeSummary>;
 };
 
 type SectionKey = keyof SummarySections;
@@ -28,8 +22,6 @@ const SECTION_CONTEXT: Record<SectionKey, string> = {
   summaryCards: 'summary cards',
   roles: 'role summaries',
   champions: 'champion summaries',
-  riskProfile: 'risk profile',
-  narrative: 'narrative',
 };
 
 const createInitialSection = <T,>(): SummarySection<T> => ({
@@ -37,12 +29,77 @@ const createInitialSection = <T,>(): SummarySection<T> => ({
   data: null,
 });
 
+const createInitialSummarySections = (): SummarySections => ({
+  summaryCards: createInitialSection(),
+  roles: createInitialSection(),
+  champions: createInitialSection(),
+});
+
+type CachedSummaryEntry = {
+  sections: SummarySections;
+  timestamp: number;
+};
+
+const SUMMARY_CACHE_TTL_MS = 5 * 60 * 1000;
+const summaryCache = new Map<string, CachedSummaryEntry>();
+
+const getCachedSections = (playerId: string): SummarySections | null => {
+  const entry = summaryCache.get(playerId);
+
+  if (!entry) {
+    return null;
+  }
+
+  const isExpired = Date.now() - entry.timestamp > SUMMARY_CACHE_TTL_MS;
+
+  if (isExpired) {
+    summaryCache.delete(playerId);
+    return null;
+  }
+
+  return entry.sections;
+};
+
+const setCachedSections = (playerId: string, sections: SummarySections): void => {
+  summaryCache.set(playerId, {
+    sections,
+    timestamp: Date.now(),
+  });
+};
+
+const mergeSections = (
+  current: SummarySections,
+  partial: Partial<SummarySections>,
+): SummarySections => ({
+  summaryCards: partial.summaryCards ?? current.summaryCards,
+  roles: partial.roles ?? current.roles,
+  champions: partial.champions ?? current.champions,
+});
+
+const hasInProgressSections = (sections: SummarySections): boolean => (
+  Object.values(sections) as SummarySection<unknown>[]
+).some((section) => isInProgressStatus(section.status));
+
+const hasReusableSections = (sections: SummarySections): boolean => (
+  Object.values(sections) as SummarySection<unknown>[]
+).every((section) => section.status === 'READY' || section.status === 'NO_MATCHES');
+
+const computeAggregates = (sections: SummarySections): { loading: boolean; error: string | null } => {
+  const loading = hasInProgressSections(sections);
+  const failedSection = (Object.values(sections) as SummarySection<unknown>[]).find(
+    (section) => section.status === 'FAILED',
+  );
+
+  return {
+    loading,
+    error: failedSection?.message ?? null,
+  };
+};
+
 export interface LastTwentyMatchesSummaryState {
   summaryCards: SummarySection<SummaryCard>;
   roles: SummarySection<RoleSummary[]>;
   champions: SummarySection<ChampionSummary[]>;
-  riskProfile: SummarySection<RiskProfile>;
-  narrative: SummarySection<NarrativeSummary>;
   loading: boolean;
   error: string | null;
 }
@@ -51,47 +108,35 @@ export class LastTwentyMatchesSummaryBloc {
   private readonly getSummaryCardsUseCase: GetLastTwentySummaryCardsUseCase;
   private readonly getRoleSummariesUseCase: GetLastTwentyRoleSummariesUseCase;
   private readonly getChampionSummariesUseCase: GetLastTwentyChampionSummariesUseCase;
-  private readonly getRiskProfileUseCase: GetLastTwentyRiskProfileUseCase;
-  private readonly getNarrativeUseCase: GetLastTwentyNarrativeUseCase;
 
   constructor(
     getSummaryCardsUseCase: GetLastTwentySummaryCardsUseCase,
     getRoleSummariesUseCase: GetLastTwentyRoleSummariesUseCase,
     getChampionSummariesUseCase: GetLastTwentyChampionSummariesUseCase,
-    getRiskProfileUseCase: GetLastTwentyRiskProfileUseCase,
-    getNarrativeUseCase: GetLastTwentyNarrativeUseCase,
   ) {
     this.getSummaryCardsUseCase = getSummaryCardsUseCase;
     this.getRoleSummariesUseCase = getRoleSummariesUseCase;
     this.getChampionSummariesUseCase = getChampionSummariesUseCase;
-    this.getRiskProfileUseCase = getRiskProfileUseCase;
-    this.getNarrativeUseCase = getNarrativeUseCase;
   }
 
   async loadSummary(
     playerId: string,
     onUpdate?: (partial: Partial<SummarySections>) => void,
   ): Promise<SummarySections> {
-  let sections: SummarySections = {
+    let sections: SummarySections = {
       summaryCards: createInitialSection(),
       roles: createInitialSection(),
       champions: createInitialSection(),
-      riskProfile: createInitialSection(),
-      narrative: createInitialSection(),
     };
 
     const fetchers = {
       summaryCards: () => this.getSummaryCardsUseCase.execute(playerId),
       roles: () => this.getRoleSummariesUseCase.execute(playerId),
       champions: () => this.getChampionSummariesUseCase.execute(playerId),
-      riskProfile: () => this.getRiskProfileUseCase.execute(playerId),
-      narrative: () => this.getNarrativeUseCase.execute(playerId),
     } satisfies {
       summaryCards: () => Promise<SummarySection<SummaryCard>>;
       roles: () => Promise<SummarySection<RoleSummary[]>>;
       champions: () => Promise<SummarySection<ChampionSummary[]>>;
-      riskProfile: () => Promise<SummarySection<RiskProfile>>;
-      narrative: () => Promise<SummarySection<NarrativeSummary>>;
     };
 
     const maxAttempts = 10;
@@ -161,43 +206,53 @@ export function useLastTwentyMatchesSummaryBloc(
   bloc: LastTwentyMatchesSummaryBloc,
   playerId: string
 ): LastTwentyMatchesSummaryState {
-  const [state, setState] = useState<LastTwentyMatchesSummaryState>(() => ({
-    summaryCards: createInitialSection(),
-    roles: createInitialSection(),
-    champions: createInitialSection(),
-    riskProfile: createInitialSection(),
-    narrative: createInitialSection(),
-    loading: true,
-    error: null,
-  }));
-
-  const mergeSections = useCallback(
-    (current: SummarySections, partial: Partial<SummarySections>): SummarySections => ({
-      summaryCards: partial.summaryCards ?? current.summaryCards,
-      roles: partial.roles ?? current.roles,
-      champions: partial.champions ?? current.champions,
-      riskProfile: partial.riskProfile ?? current.riskProfile,
-      narrative: partial.narrative ?? current.narrative,
-    }),
-    []
-  );
-
-  const computeAggregates = useCallback((sections: SummarySections) => {
-    const loading = (Object.values(sections) as SummarySection<unknown>[]).some((section) =>
-      isInProgressStatus(section.status)
-    );
-    const failed = (Object.values(sections) as SummarySection<unknown>[]).find(
-      (section) => section.status === 'FAILED'
-    );
+  const [state, setState] = useState<LastTwentyMatchesSummaryState>(() => {
+    const cachedSections = getCachedSections(playerId);
+    const seedSections = cachedSections ?? createInitialSummarySections();
+    const aggregates = computeAggregates(seedSections);
 
     return {
-      loading,
-      error: failed?.message ?? null,
-    } as const;
-  }, []);
+      summaryCards: seedSections.summaryCards,
+      roles: seedSections.roles,
+      champions: seedSections.champions,
+      loading: aggregates.loading,
+      error: aggregates.error,
+    };
+  });
 
   useEffect(() => {
     let cancelled = false;
+
+    const cachedSections = getCachedSections(playerId);
+    const reusable = cachedSections ? hasReusableSections(cachedSections) : false;
+
+    if (cachedSections) {
+      const aggregates = computeAggregates(cachedSections);
+      setState({
+        summaryCards: cachedSections.summaryCards,
+        roles: cachedSections.roles,
+        champions: cachedSections.champions,
+        loading: aggregates.loading,
+        error: aggregates.error,
+      });
+
+      if (reusable) {
+        return () => {
+          cancelled = true;
+        };
+      }
+    } else {
+      const seedSections = createInitialSummarySections();
+      const aggregates = computeAggregates(seedSections);
+
+      setState({
+        summaryCards: seedSections.summaryCards,
+        roles: seedSections.roles,
+        champions: seedSections.champions,
+        loading: aggregates.loading,
+        error: aggregates.error,
+      });
+    }
 
     const loadData = async () => {
       const applyPartial = (partial: Partial<SummarySections>) => {
@@ -210,8 +265,6 @@ export function useLastTwentyMatchesSummaryBloc(
             summaryCards: prev.summaryCards,
             roles: prev.roles,
             champions: prev.champions,
-            riskProfile: prev.riskProfile,
-            narrative: prev.narrative,
           };
 
           const nextSections = mergeSections(currentSections, partial);
@@ -221,8 +274,6 @@ export function useLastTwentyMatchesSummaryBloc(
             summaryCards: nextSections.summaryCards,
             roles: nextSections.roles,
             champions: nextSections.champions,
-            riskProfile: nextSections.riskProfile,
-            narrative: nextSections.narrative,
             loading: aggregates.loading,
             error: aggregates.error,
           };
@@ -239,6 +290,7 @@ export function useLastTwentyMatchesSummaryBloc(
         const finalSections = await bloc.loadSummary(playerId, applyPartial);
 
         applyPartial(finalSections);
+        setCachedSections(playerId, finalSections);
       } catch (error) {
         if (!cancelled) {
           const failureSections: SummarySections = {
@@ -253,16 +305,6 @@ export function useLastTwentyMatchesSummaryBloc(
               message: error instanceof Error ? error.message : 'Failed to load summary',
             },
             champions: {
-              status: 'FAILED',
-              data: null,
-              message: error instanceof Error ? error.message : 'Failed to load summary',
-            },
-            riskProfile: {
-              status: 'FAILED',
-              data: null,
-              message: error instanceof Error ? error.message : 'Failed to load summary',
-            },
-            narrative: {
               status: 'FAILED',
               data: null,
               message: error instanceof Error ? error.message : 'Failed to load summary',
@@ -285,7 +327,7 @@ export function useLastTwentyMatchesSummaryBloc(
     return () => {
       cancelled = true;
     };
-  }, [bloc, playerId, computeAggregates, mergeSections]);
+  }, [bloc, playerId]);
 
   return state;
 }

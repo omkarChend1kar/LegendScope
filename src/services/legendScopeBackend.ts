@@ -1,6 +1,10 @@
 import axios from 'axios';
 import type { AxiosInstance } from 'axios';
 import type { BackendStatus } from '../types/BackendStatus';
+import type {
+  PlaystyleSummaryModel,
+  RiotParticipantModel,
+} from '../features/patterns-beneath-chaos/data/models/PatternsSummaryModel';
 
 export interface ApiEnvelope<T> {
   status: BackendStatus;
@@ -67,19 +71,6 @@ export interface ChampionSummaryData {
   games_played: number;
   total_claims?: number;
   win_rate: number;
-}
-
-export interface RiskProfileData {
-  aggression_score: number;
-  early_fall_rate: number;
-  objective_control_score: number;
-  vision_commitment_score: number;
-  narrative: string;
-}
-
-export interface NarrativeSummaryData {
-  headline: string;
-  body: string;
 }
 
 export interface MatchesRequest {
@@ -169,16 +160,16 @@ class LegendScopeBackendClient {
     return response.data;
   }
 
-  async getRiskProfile(playerId: string): Promise<ApiEnvelope<RiskProfileData>> {
-    const response = await this.client.get<ApiEnvelope<RiskProfileData>>(
-      `/battles/${playerId}/summary/last-20/risk-profile`
+  async getSignaturePlaystyleParticipants(playerId: string): Promise<ApiEnvelope<RiotParticipantModel[]>> {
+    const response = await this.client.get<ApiEnvelope<RiotParticipantModel[]>>(
+      `/battles/${playerId}/signature-playstyle/last-20`
     );
     return response.data;
   }
 
-  async getNarrative(playerId: string): Promise<ApiEnvelope<NarrativeSummaryData>> {
-    const response = await this.client.get<ApiEnvelope<NarrativeSummaryData>>(
-      `/battles/${playerId}/summary/last-20/narrative`
+  async getSignaturePlaystyleSummary(playerId: string): Promise<ApiEnvelope<PlaystyleSummaryModel>> {
+    const response = await this.client.get<ApiEnvelope<PlaystyleSummaryModel>>(
+      `/battles/${playerId}/signature-playstyle/summary`
     );
     return response.data;
   }
