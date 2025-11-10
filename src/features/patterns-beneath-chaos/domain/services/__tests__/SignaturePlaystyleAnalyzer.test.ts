@@ -22,7 +22,7 @@ describe('SignaturePlaystyleAnalyzer', () => {
       expect(axis.score).toBeLessThanOrEqual(100);
       expect(Object.keys(axis.evidence).length).toBeGreaterThan(0);
       Object.values(axis.evidence).forEach((value) => {
-        expect(isFiniteNumber(value)).toBe(true);
+        expect(isFiniteNumber(value as number)).toBe(true);
       });
     });
 
