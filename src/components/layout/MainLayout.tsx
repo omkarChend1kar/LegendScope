@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
-import { TopBar } from './TopBar';
 
 const LayoutContainer = styled.div`
   display: flex;
-  min-height: 100vh;
+  height: 100%;
   background: #020617;
   position: relative;
   overflow: hidden;
@@ -17,15 +16,20 @@ const ContentArea = styled.main<{ $sidebarCollapsed: boolean }>`
   position: relative;
   z-index: 2;
   transition: margin-left ${theme.animations.transition.normal};
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 `;
 
 const PageContainer = styled.div`
+  flex: 1;
   width: 100%;
-  min-height: calc(100vh - 73px);
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
   
   /* Custom scrollbar */
   &::-webkit-scrollbar {
@@ -50,15 +54,17 @@ interface MainLayoutProps {
   sidebar: ReactNode;
   children: ReactNode;
   sidebarCollapsed?: boolean;
-  onChangePlayer?: () => void;
 }
 
-export const MainLayout = ({ sidebar, children, sidebarCollapsed = false, onChangePlayer }: MainLayoutProps) => {
+export const MainLayout = ({ 
+  sidebar, 
+  children, 
+  sidebarCollapsed = false,
+}: MainLayoutProps) => {
   return (
     <LayoutContainer>
       {sidebar}
       <ContentArea $sidebarCollapsed={sidebarCollapsed}>
-        <TopBar onChangePlayer={onChangePlayer} />
         <PageContainer>
           {children}
         </PageContainer>

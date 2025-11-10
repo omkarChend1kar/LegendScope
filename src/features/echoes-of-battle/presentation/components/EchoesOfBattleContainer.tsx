@@ -1,53 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AnalyticsContainer,
   AnalyticsHeader,
   HeaderTop,
   AnalyticsTitle,
   AnalyticsContent,
-  TabsContainer,
-  Tab,
 } from '../styles/Layout.styles';
 import { LastTwentyMatchesSummarySection } from './LastTwentyMatchesSummarySection';
-import { HistoricalInsightsPlaceholder } from './HistoricalInsightsPlaceholder';
+import { SyncHeader } from '../../../../components/shared/SyncHeader';
 
 interface EchoesOfBattleContainerProps {
   playerId: string;
+  onSync?: () => Promise<void>;
+  lastSyncTime?: Date | null;
 }
 
-export const EchoesOfBattleContainer: React.FC<EchoesOfBattleContainerProps> = ({ playerId }) => {
-  const [activeTab, setActiveTab] = useState<'summary' | 'insights'>('summary');
-
+export const EchoesOfBattleContainer: React.FC<EchoesOfBattleContainerProps> = ({ 
+  playerId,
+  onSync,
+  lastSyncTime 
+}) => {
   return (
     <AnalyticsContainer>
-      {/* Header with Title and Time Range Selector */}
+      {/* Header with Title */}
       <AnalyticsHeader>
         <HeaderTop>
           <AnalyticsTitle>Echoes of Battle</AnalyticsTitle>
+          <SyncHeader lastSyncTime={lastSyncTime} onSync={onSync} />
         </HeaderTop>
-        <TabsContainer>
-          <Tab
-            $active={activeTab === 'summary'}
-            onClick={() => setActiveTab('summary')}
-          >
-            Last 20 Battles
-          </Tab>
-          <Tab
-            $active={activeTab === 'insights'}
-            onClick={() => setActiveTab('insights')}
-          >
-            Historical Insights
-          </Tab>
-        </TabsContainer>
       </AnalyticsHeader>
 
       {/* Main Content */}
       <AnalyticsContent>
-        {activeTab === 'summary' ? (
-          <LastTwentyMatchesSummarySection playerId={playerId} />
-        ) : (
-          <HistoricalInsightsPlaceholder playerId={playerId} />
-        )}
+        <LastTwentyMatchesSummarySection playerId={playerId} />
       </AnalyticsContent>
     </AnalyticsContainer>
   );

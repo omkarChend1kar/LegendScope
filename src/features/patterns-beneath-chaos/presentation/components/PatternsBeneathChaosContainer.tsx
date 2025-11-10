@@ -7,10 +7,14 @@ import { PatternsBeneathChaosDashboard } from './PatternsBeneathChaosDashboard';
 
 interface PatternsBeneathChaosContainerProps {
     playerId: string | null;
+    onSync?: () => Promise<void>;
+    lastSyncTime?: Date | null;
 }
 
 export const PatternsBeneathChaosContainer: React.FC<PatternsBeneathChaosContainerProps> = ({
     playerId,
+    onSync,
+    lastSyncTime,
 }) => {
     const useMockData = (import.meta.env.VITE_PATTERNS_USE_MOCK_DATA ?? 'false') === 'true';
     const repository = useMemo(() => new PatternsRepositoryImpl(useMockData), [useMockData]);
@@ -27,6 +31,8 @@ export const PatternsBeneathChaosContainer: React.FC<PatternsBeneathChaosContain
                 error="Link your Summoner profile to unlock deep-pattern analysis."
                 status="NOT_STARTED"
                 message={null}
+                onSync={onSync}
+                lastSyncTime={lastSyncTime}
             />
         );
     }
@@ -38,6 +44,8 @@ export const PatternsBeneathChaosContainer: React.FC<PatternsBeneathChaosContain
             error={error}
             status={status}
             message={message}
+            onSync={onSync}
+            lastSyncTime={lastSyncTime}
         />
     );
 };

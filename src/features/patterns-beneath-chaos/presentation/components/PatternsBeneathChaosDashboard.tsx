@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   PatternsLayout,
   PatternsContent,
   PatternsHeader,
   PatternsHeaderTop,
   PatternsTitle,
-  TabsRow,
-  TabButton,
   SummaryHeader,
   SummaryPrimaryColumn,
   SummaryMetaColumn,
@@ -96,6 +94,7 @@ import {
   Tooltip,
 } from 'recharts';
 import type { BackendStatus } from '../../../../types/BackendStatus';
+import { SyncHeader } from '../../../../components/shared/SyncHeader';
 
 interface PatternsBeneathChaosDashboardProps {
   summary: PatternsSummary | null;
@@ -103,6 +102,8 @@ interface PatternsBeneathChaosDashboardProps {
   error: string | null;
   status: BackendStatus;
   message: string | null;
+  onSync?: () => Promise<void>;
+  lastSyncTime?: Date | null;
 }
 const formatPercent = (value: number): string => `${Math.round(value * 100)}%`;
 
@@ -112,27 +113,9 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
   error,
   status,
   message,
+  onSync,
+  lastSyncTime,
 }) => {
-  const [activeTab, setActiveTab] = useState<'last20' | 'historical'>('last20');
-
-  const renderTabs = (interactive = true) => (
-    <TabsRow>
-      <TabButton
-        $active={activeTab === 'last20'}
-        onClick={() => interactive && setActiveTab('last20')}
-        disabled={!interactive}
-      >
-        Last 20 Battles
-      </TabButton>
-      <TabButton
-        $active={activeTab === 'historical'}
-        onClick={() => interactive && setActiveTab('historical')}
-        disabled={!interactive}
-      >
-        Historical Insights
-      </TabButton>
-    </TabsRow>
-  );
 
   if (loading) {
     return (
@@ -140,8 +123,8 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
         <PatternsHeader>
           <PatternsHeaderTop>
             <PatternsTitle>Signature Playstyle Analyzer</PatternsTitle>
+            <SyncHeader lastSyncTime={lastSyncTime} onSync={onSync} />
           </PatternsHeaderTop>
-          {renderTabs(false)}
         </PatternsHeader>
         <PatternsContent>
           <SectionCard>
@@ -150,7 +133,7 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
               <SectionSubtitle>Crunching the last 20 matches to surface your defining trends.</SectionSubtitle>
             </SectionHeader>
             <p style={{ color: 'rgba(148, 163, 184, 0.8)', margin: 0 }}>
-              We’re stitching combat tempo, macro pressure, and vision habits into a cohesive profile. Hang tight!
+              We're stitching combat tempo, macro pressure, and vision habits into a cohesive profile. Hang tight!
             </p>
           </SectionCard>
         </PatternsContent>
@@ -164,8 +147,8 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
         <PatternsHeader>
           <PatternsHeaderTop>
             <PatternsTitle>Signature Playstyle Analyzer</PatternsTitle>
+            <SyncHeader lastSyncTime={lastSyncTime} onSync={onSync} />
           </PatternsHeaderTop>
-          {renderTabs()}
         </PatternsHeader>
         <PatternsContent>
           <SectionCard>
@@ -183,20 +166,16 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
     const infoTitle = status === 'NO_MATCHES'
       ? 'Need a few more clashes'
       : 'Signature analyzer warming up';
-    const infoSubtitle = message ?? (activeTab === 'historical'
-      ? 'We’ll surface longer-range storylines once your match history deepens.'
-      : 'Link or play additional matches to unlock your analyzer');
-    const defaultDescription = activeTab === 'historical'
-      ? 'Keep playing and we’ll unlock cross-season tempo and macro evolution views here.'
-      : 'We’ll chart both recent form and historical insights once enough data flows in.';
+    const infoSubtitle = message ?? 'Link or play additional matches to unlock your analyzer';
+    const defaultDescription = 'We\'ll chart your recent form once enough data flows in.';
 
     return (
       <PatternsLayout>
         <PatternsHeader>
           <PatternsHeaderTop>
             <PatternsTitle>Signature Playstyle Analyzer</PatternsTitle>
+            <SyncHeader lastSyncTime={lastSyncTime} onSync={onSync} />
           </PatternsHeaderTop>
-          {renderTabs()}
         </PatternsHeader>
         <PatternsContent>
           {message ? (
@@ -209,7 +188,7 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
           ) : (
             <HistoricalPlaceholder>
               <SectionHeader>
-                <SectionTitle>{activeTab === 'historical' ? 'Historical insights warming up' : 'No patterns yet'}</SectionTitle>
+                <SectionTitle>No patterns yet</SectionTitle>
                 <SectionSubtitle>{infoSubtitle}</SectionSubtitle>
               </SectionHeader>
               <p style={{ margin: 0, color: 'rgba(148, 163, 184, 0.82)' }}>
@@ -222,7 +201,6 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
     );
   }
 
-  const tabs = renderTabs();
   const windowLabel = summary.summary.windowLabel ?? 'Last 20 battles';
 
   const axisValues = Object.values(summary.axes) as PlaystyleAxis[];
@@ -336,13 +314,11 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
       <PatternsHeader>
         <PatternsHeaderTop>
           <PatternsTitle>Signature Playstyle Analyzer</PatternsTitle>
+          <SyncHeader lastSyncTime={lastSyncTime} onSync={onSync} />
         </PatternsHeaderTop>
-        {tabs}
       </PatternsHeader>
 
       <PatternsContent>
-        {activeTab === 'last20' ? (
-          <>
             <SummaryHeader>
               <SummaryPrimaryColumn>
                 <SummaryHeadingLabel>Identity Anchors</SummaryHeadingLabel>
@@ -637,19 +613,6 @@ export const PatternsBeneathChaosDashboard: React.FC<PatternsBeneathChaosDashboa
                 ))}
               </InsightList>
             </SectionCard>
-          </>
-        ) : (
-          <HistoricalPlaceholder>
-            <SectionHeader>
-              <SectionTitle>Historical Insights</SectionTitle>
-              <SectionSubtitle>We&apos;re preparing cross-season trendlines tailored to your playstyle</SectionSubtitle>
-            </SectionHeader>
-            <p style={{ margin: 0, color: 'rgba(148, 163, 184, 0.82)' }}>
-              Soon you&apos;ll be able to dive into patch-to-patch evolution, lane matchup archetypes, and macro adaptations
-              beyond the last 20 battles. Stay tuned while we knit those archives into the analyzer.
-            </p>
-          </HistoricalPlaceholder>
-        )}
       </PatternsContent>
     </PatternsLayout>
   );

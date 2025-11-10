@@ -27,9 +27,11 @@ export const PatternsHeaderTop = styled.div`
 
 export const PatternsTitle = styled.h1`
   margin: 0;
-  font-size: ${designTokens.typography.fontSize.xl};
+  font-family: 'Cinzel', serif;
+  font-size: ${designTokens.typography.fontSize['3xl']};
   font-weight: ${designTokens.typography.fontWeight.bold};
-  color: ${designTokens.colors.text.primary};
+  letter-spacing: 0.04em;
+  color: #fcd34d;
 `;
 
 export const TabsRow = styled.div`

@@ -4,9 +4,11 @@ import { PatternsBeneathChaosContainer } from '../../features/patterns-beneath-c
 
 interface PatternsBeneathChaosProps {
   playerData: PlayerData | null;
+  onSync?: () => Promise<void>;
+  lastSyncTime?: Date | null;
 }
 
-export const PatternsBeneathChaos: React.FC<PatternsBeneathChaosProps> = ({ playerData }) => {
+export const PatternsBeneathChaos: React.FC<PatternsBeneathChaosProps> = ({ playerData, onSync, lastSyncTime }) => {
   if (!playerData?.puuid) {
     return (
       <div
@@ -26,5 +28,5 @@ export const PatternsBeneathChaos: React.FC<PatternsBeneathChaosProps> = ({ play
     );
   }
 
-  return <PatternsBeneathChaosContainer playerId={playerData.puuid} />;
+  return <PatternsBeneathChaosContainer playerId={playerData.puuid} onSync={onSync} lastSyncTime={lastSyncTime} />;
 };

@@ -150,9 +150,11 @@ export const HeaderTop = styled.div`
 `;
 
 export const AnalyticsTitle = styled.h1`
-  font-size: ${designTokens.typography.fontSize.xl};
+  font-family: 'Cinzel', serif;
+  font-size: ${designTokens.typography.fontSize['3xl']};
   font-weight: ${designTokens.typography.fontWeight.bold};
-  color: ${designTokens.colors.text.primary};
+  letter-spacing: 0.04em;
+  color: #fcd34d;
   margin: 0;
 `;
 

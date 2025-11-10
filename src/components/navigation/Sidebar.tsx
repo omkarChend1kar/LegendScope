@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
-import { ChevronLeft, ChevronRight, Swords } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Swords, UserCircle } from 'lucide-react';
 import { NAVIGATION_SECTIONS } from './Sidebar.config';
 import type { SectionId } from './Sidebar.config';
 import type { PlayerData } from '../../types/PlayerData';
@@ -218,14 +218,76 @@ const RankBadge = styled.span`
   border-radius: 0.25rem;
 `;
 
+const Footer = styled.div<{ $collapsed: boolean }>`
+  padding: ${props => props.$collapsed ? '0.75rem 0.5rem' : '0.75rem 1rem'};
+  border-top: 1px solid #1e293b;
+  margin-top: auto;
+`;
+
+const SwitchPlayerButton = styled.button<{ $collapsed: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: ${props => props.$collapsed ? 'center' : 'flex-start'};
+  gap: 0.75rem;
+  padding: ${props => props.$collapsed ? '0.75rem' : '0.75rem 1rem'};
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all ${theme.animations.transition.normal};
+  font-size: 0.875rem;
+  font-weight: ${theme.typography.fontWeight.medium};
+  
+  &:hover {
+    background: #1e293b;
+    color: #fbbf24;
+    border-color: #fbbf24;
+  }
+  
+  svg {
+    min-width: 20px;
+  }
+  
+  span {
+    display: ${props => props.$collapsed ? 'none' : 'block'};
+    opacity: ${props => props.$collapsed ? 0 : 1};
+    transition: opacity ${theme.animations.transition.normal};
+    white-space: nowrap;
+  }
+`;
+
 interface SidebarProps {
   activeSection: SectionId;
   onSectionChange: (section: SectionId) => void;
   playerData: PlayerData | null;
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  onChangePlayer?: () => void;
 }
 
-export const Sidebar = ({ activeSection, onSectionChange, playerData }: SidebarProps) => {
-  const [collapsed, setCollapsed] = useState(false);
+export const Sidebar = ({ 
+  activeSection, 
+  onSectionChange, 
+  playerData, 
+  collapsed: externalCollapsed,
+  onCollapsedChange,
+  onChangePlayer
+}: SidebarProps) => {
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  
+  // Use external collapsed state if provided, otherwise use internal
+  const collapsed = externalCollapsed !== undefined ? externalCollapsed : internalCollapsed;
+  
+  const handleToggle = () => {
+    const newCollapsed = !collapsed;
+    if (onCollapsedChange) {
+      onCollapsedChange(newCollapsed);
+    } else {
+      setInternalCollapsed(newCollapsed);
+    }
+  };
 
   // Extract player info or use defaults
   const summonerName = playerData?.summoner.name || "Guest";
@@ -236,7 +298,7 @@ export const Sidebar = ({ activeSection, onSectionChange, playerData }: SidebarP
   return (
     <SidebarContainer $collapsed={collapsed}>
       <CollapseButton 
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={handleToggle}
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
@@ -262,9 +324,9 @@ export const Sidebar = ({ activeSection, onSectionChange, playerData }: SidebarP
             <ProfileInfo $collapsed={collapsed}>
               <ProfileName>{gameName}</ProfileName>
               <ProfileTag>#{tagLine}</ProfileTag>
-              <ProfileBadges>
+              {/* <ProfileBadges>
                 <RankBadge>{rankDisplay}</RankBadge>
-              </ProfileBadges>
+              </ProfileBadges> */}
             </ProfileInfo>
           )}
         </ProfileContent>
@@ -291,6 +353,21 @@ export const Sidebar = ({ activeSection, onSectionChange, playerData }: SidebarP
           );
         })}
       </NavList>
+      
+      {/* Footer with Switch Player button */}
+      {onChangePlayer && (
+        <Footer $collapsed={collapsed}>
+          <SwitchPlayerButton 
+            $collapsed={collapsed}
+            onClick={onChangePlayer}
+            title={collapsed ? 'Switch Player' : undefined}
+            aria-label="Switch Player"
+          >
+            <UserCircle size={20} />
+            <span>Switch Player</span>
+          </SwitchPlayerButton>
+        </Footer>
+      )}
     </SidebarContainer>
   );
 };

@@ -5,6 +5,7 @@ import type {
   PlaystyleSummaryModel,
   RiotParticipantModel,
 } from '../features/patterns-beneath-chaos/data/models/PatternsSummaryModel';
+import type { FaultlinesSummaryModel } from '../features/faultlines/data/models/FaultlinesSummaryModel';
 
 export interface ApiEnvelope<T> {
   status: BackendStatus;
@@ -169,8 +170,22 @@ class LegendScopeBackendClient {
 
   async getSignaturePlaystyleSummary(playerId: string): Promise<ApiEnvelope<PlaystyleSummaryModel>> {
     const response = await this.client.get<ApiEnvelope<PlaystyleSummaryModel>>(
-      `/battles/${playerId}/signature-playstyle/summary`
+      `/battles/${playerId}/signature-playstyle/summary`,
+      {
+        timeout: 30000, // 30 seconds - Faultlines analysis requires heavy computation
+      }
     );
+    return response.data;
+  }
+
+  async getFaultlinesSummary(playerId: string): Promise<ApiEnvelope<FaultlinesSummaryModel>> {
+    const response = await this.client.get<ApiEnvelope<FaultlinesSummaryModel>>(
+      `/battles/${playerId}/faultlines/summary`,
+      {
+        timeout: 30000, // 30 seconds - Faultlines analysis requires heavy computation
+      }
+    );
+    console.log('[LegendScopeBackend] Faultlines summary response', response.data);
     return response.data;
   }
 

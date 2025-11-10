@@ -4,9 +4,11 @@ import type { PlayerData } from '../../types/PlayerData';
 
 interface EchoesOfBattleProps {
   playerData: PlayerData | null;
+  onSync?: () => Promise<void>;
+  lastSyncTime?: Date | null;
 }
 
-export const EchoesOfBattle: React.FC<EchoesOfBattleProps> = ({ playerData }) => {
+export const EchoesOfBattle: React.FC<EchoesOfBattleProps> = ({ playerData, onSync, lastSyncTime }) => {
   if (!playerData?.puuid) {
     return (
       <div
@@ -25,5 +27,5 @@ export const EchoesOfBattle: React.FC<EchoesOfBattleProps> = ({ playerData }) =>
     );
   }
 
-  return <EchoesOfBattleContainer playerId={playerData.puuid} />;
+  return <EchoesOfBattleContainer playerId={playerData.puuid} onSync={onSync} lastSyncTime={lastSyncTime} />;
 };
