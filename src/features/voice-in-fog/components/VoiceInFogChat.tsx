@@ -45,8 +45,8 @@ export const VoiceInFogChat: React.FC<VoiceInFogChatProps> = ({
         const assistantMessage: Message = {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
-          content: response.response,
-          timestamp: response.timestamp,
+          content: response.response ?? 'No response received.',
+          timestamp: response.timestamp ?? new Date().toISOString(),
         };
 
         setMessages((prev) => [...prev, assistantMessage]);

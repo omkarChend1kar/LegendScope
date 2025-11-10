@@ -20,6 +20,9 @@ describe('GetPatternsSummaryUseCase', () => {
           data: model,
         };
       },
+      async clearCachedSummary(_playerId: string): Promise<void> {
+        // No-op for test stub
+      },
     };
 
     const useCase = new GetPatternsSummaryUseCase(repositoryStub);

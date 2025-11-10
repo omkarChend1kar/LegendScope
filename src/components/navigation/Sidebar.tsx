@@ -202,21 +202,7 @@ const ProfileTag = styled.div`
   margin-top: 0.125rem;
 `;
 
-const ProfileBadges = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
-`;
 
-const RankBadge = styled.span`
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-  border-radius: 0.25rem;
-`;
 
 const Footer = styled.div<{ $collapsed: boolean }>`
   padding: ${props => props.$collapsed ? '0.75rem 0.5rem' : '0.75rem 1rem'};
@@ -292,8 +278,8 @@ export const Sidebar = ({
   // Extract player info or use defaults
   const summonerName = playerData?.summoner.name || "Guest";
   const [gameName, tagLine] = playerData?.riotId.split('#') || [summonerName, "TAG"];
-  const summonerLevel = playerData?.summoner.level || 1;
-  const rankDisplay = `Level ${summonerLevel}`;
+
+
 
   return (
     <SidebarContainer $collapsed={collapsed}>

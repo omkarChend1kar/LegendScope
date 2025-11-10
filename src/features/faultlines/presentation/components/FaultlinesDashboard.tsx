@@ -6,7 +6,6 @@ import {
   FaultlinesTitle,
   FaultlinesSubtitle,
   FaultlinesContent,
-  FaultlinesMeta,
   AxisGrid,
   AxisCard,
   AxisHeader,
@@ -91,19 +90,6 @@ const determineTone = (score: number): 'strong' | 'steady' | 'caution' => {
   return 'steady';
 };
 
-const formatGeneratedAt = (timestamp: string): string => {
-  try {
-    const date = new Date(timestamp);
-    return date.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return timestamp;
-  }
-};
 
 const renderVisualization = (axis: FaultlineAxis): React.ReactNode => {
   const visualization = axis.visualization;
@@ -547,9 +533,6 @@ export const FaultlinesDashboard: React.FC<FaultlinesDashboardProps> = ({
       </FaultlinesLayout>
     );
   }
-
-  const windowLabel = summary.windowLabel ?? 'Last 20 matches';
-  const generatedAt = formatGeneratedAt(summary.generatedAt);
 
   return (
     <FaultlinesLayout>
